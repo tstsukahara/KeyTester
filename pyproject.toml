@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "keytester"
+version = "0.1.0"
+description = ""
+authors = ["tstsukahara <9626666+tstsukahara@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "<3.14,>=3.9"
+pillow = "^11.1.0"
+pyqt5 = "^5.15.11"
+
+
+[tool.poetry.group.dev.dependencies]
+pyinstaller = "^6.11.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
