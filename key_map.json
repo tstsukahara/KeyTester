@@ -1,10 +1,22 @@
 {
-    "a": {
-        "image": "images/a.png",
-        "description": "Cherry MX RedX"
+    "q": {
+        "image": "images/CherryMX2A-SilentRed.jpg",
+        "switch_name": "Cherry MX Red"
     },
-    "b": {
+    "w": {
         "image": null,
-        "description": "Cherry MX Blue"
+        "switch_name": "Cherry MX Blue"
+    },
+    "e": {
+        "image": null,
+        "switch_name": "Cherry MX Blue"
+    },
+    "r": {
+        "image": null,
+        "switch_name": "Cherry MX Blue"
+    },
+    "t": {
+        "image": null,
+        "switch_name": "Cherry MX Blue"
     }
 }
