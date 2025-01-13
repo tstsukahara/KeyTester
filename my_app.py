@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 import sys
 import json
 import os
+import shutil
 
 class KeyTesterApp(QtWidgets.QWidget):
     def __init__(self):
@@ -12,6 +13,8 @@ class KeyTesterApp(QtWidgets.QWidget):
 
         # キーマッピングの保存ファイル
         self.config_file = "key_map.json"
+        self.image_dir = "images"
+        os.makedirs(self.image_dir, exist_ok=True)
         self.key_map = self.load_key_map()
 
         # レイアウトの作成
@@ -89,7 +92,10 @@ class KeyTesterApp(QtWidgets.QWidget):
             def choose_image(key=key):
                 file_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select Image", "", "Images (*.png *.jpg *.jpeg)")
                 if file_path:
-                    self.key_map[key]["image"] = file_path
+                    # Save the selected image with a fixed file name based on the key
+                    saved_path = os.path.join(self.image_dir, f"{key}.png")
+                    shutil.copy(file_path, saved_path)
+                    self.key_map[key]["image"] = saved_path
 
             choose_image_button.clicked.connect(lambda _, key=key: choose_image(key))
 
