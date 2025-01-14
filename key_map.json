@@ -1,8 +1,23 @@
 {
+    "default": {
+        "image": "",
+        "switch_name": "-",
+        "switch_type": "-",
+        "operation_force": "-",
+        "link": "-"
+    },
     "q": {
         "image": "images/CherryMX2A-SilentRed.jpg",
-        "switch_name": "Gateron MX RedX",
-        "switch_type": "Tactile",
-        "operation_force": "45g"
+        "switch_name": "Gateron MX Red",
+        "switch_type": "Linear",
+        "operation_force": "45g",
+        "link": "https://shop.yushakobo.jp/products/8449?variant=48653182009575"
+    },
+    "e": {
+        "image": "",
+        "switch_name": "-",
+        "switch_type": "-",
+        "operation_force": "-",
+        "link": "-"
     }
 }

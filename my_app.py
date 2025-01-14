@@ -1,5 +1,4 @@
 import shutil
-
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 import sys
@@ -9,8 +8,7 @@ import os
 from PyQt5.QtWidgets import QHBoxLayout
 
 QWERT_KEYS = "qwert"
-SWITCH_TYPES = ["Linear", "Tactile", "Clicky", "Silent Linear", "Silent Tactile", "Silent Clicky",]
-
+SWITCH_TYPES = ["-", "Linear", "Tactile", "Clicky", "Silent Linear", "Silent Tactile", "Silent Clicky",]
 
 class KeyTesterApp(QtWidgets.QWidget):
     def __init__(self):
@@ -47,10 +45,12 @@ class KeyTesterApp(QtWidgets.QWidget):
         self.image_label.setAlignment(Qt.AlignCenter)
         self.image_layout.addWidget(self.image_label)
         self.main_layout.addLayout(self.image_layout)
+        self.is_image_updated = False
 
         # 名前
         self.switch_name_layout = QtWidgets.QHBoxLayout()
         self.switch_name = QtWidgets.QLabel("", self)
+        self.switch_name.setStyleSheet("font-weight: bold;")
         self.switch_name.setAlignment(Qt.AlignCenter)
         self.switch_name_layout.addWidget(self.switch_name)
         self.main_layout.addLayout(self.switch_name_layout)
@@ -68,6 +68,16 @@ class KeyTesterApp(QtWidgets.QWidget):
         self.force.setAlignment(Qt.AlignCenter)
         self.force_layout.addWidget(self.force)
         self.main_layout.addLayout(self.force_layout)
+
+        # Link
+        self.link_layout = QtWidgets.QHBoxLayout()
+        self.link = QtWidgets.QLabel("", self)
+        self.link.setOpenExternalLinks(True)
+        self.link.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        self.link.setAlignment(Qt.AlignCenter)
+        self.link.setTextFormat(Qt.RichText)
+        self.link_layout.addWidget(self.link)
+        self.main_layout.addLayout(self.link_layout)
 
         # 編集ボタン
         self.edit_button = QtWidgets.QPushButton("Edit", self)
@@ -109,14 +119,20 @@ class KeyTesterApp(QtWidgets.QWidget):
             self.switch_name.setText(f'Name: {key_info["switch_name"]}')
             self.switch_type.setText(f'Type: {key_info["switch_type"]}')
             self.force.setText(f'Operation Force: {key_info["operation_force"]}')
+            self.link.setText('<a href="{}">link</a>'.format(key_info["link"]))
         else:
             self.message_label.setText("No information available.")
             self.message_label.show()
             self.image_label.clear()
             self.switch_name.clear()
             self.switch_type.clear()
+            self.force.clear()
+            self.link.clear()
 
     def open_settings(self):
+        if self.key not in self.key_map:
+            self.key_map[self.key] = self.key_map["default"]
+
         settings_window = QtWidgets.QDialog(self)
         settings_window.setWindowTitle("Settings")
         main_layout = QtWidgets.QVBoxLayout()
@@ -134,19 +150,11 @@ class KeyTesterApp(QtWidgets.QWidget):
 
         image = QtWidgets.QLabel(os.path.basename(self.key_map[self.key]["image"]))
         image_layout.addWidget(image)
+
         choose_image_button = QtWidgets.QPushButton("Choose Image", self)
+        choose_image_button.clicked.connect(lambda: self.choose_image(image))
         image_layout.addWidget(choose_image_button)
         main_layout.addLayout(image_layout)
-
-        def choose_image(key):
-            file_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select Image", "",
-                                                                 "Images (*.png *.jpg *.jpeg)")
-            if file_path:
-                saved_path = os.path.join(self.image_dir, os.path.basename(file_path))
-                shutil.copy(file_path, saved_path)
-                self.key_map[key]["image"] = saved_path
-
-        choose_image_button.clicked.connect(lambda _, key=self.key: choose_image(key))
 
         # 名前
         name_layout = QtWidgets.QHBoxLayout()
@@ -179,12 +187,24 @@ class KeyTesterApp(QtWidgets.QWidget):
         force_layout.addWidget(force_entry)
         main_layout.addLayout(force_layout)
 
+        # Link
+        link_layout = QtWidgets.QHBoxLayout()
+        link_label = QtWidgets.QLabel("Link URL:  ")
+        link_layout.addWidget(link_label)
+
+        link_entry = QtWidgets.QLineEdit(self)
+        link_entry.setText(self.key_map[self.key]["link"])
+        link_layout.addWidget(link_entry)
+        main_layout.addLayout(link_layout)
+
         # Saveボタン
         save_button = QtWidgets.QPushButton("Save", self)
         entry_map = {
+            "image": image,
             "switch_name": name_entry,
             "switch_type": type_entry,
-            "operation_force": force_entry
+            "operation_force": force_entry,
+            "link": link_entry
         }
         save_button.clicked.connect(lambda: self.update_key_map(entry_map))
         main_layout.addWidget(save_button)
@@ -192,12 +212,28 @@ class KeyTesterApp(QtWidgets.QWidget):
         settings_window.setLayout(main_layout)
         settings_window.exec_()
 
+    def choose_image(self, image):
+        file_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select Image", "",
+                                                             "Images (*.png *.jpg *.jpeg)")
+        image.setText(file_path)
+        self.is_image_updated = True
+
     def update_key_map(self, entry_map):
+        self.save_image(entry_map["image"])
         self.key_map[self.key]["switch_name"] = entry_map["switch_name"].text()
         self.key_map[self.key]["switch_type"] = entry_map["switch_type"].currentText()
         self.key_map[self.key]["operation_force"] = entry_map["operation_force"].text()
+        self.key_map[self.key]["link"] = entry_map["link"].text()
         self.save_key_map()
         self.display_info()
+        self.message_label.hide()
+
+    def save_image(self, image):
+        file_path = image.text()
+        if file_path and self.is_image_updated:
+            saved_path = os.path.join(self.image_dir, os.path.basename(file_path))
+            shutil.copy(file_path, saved_path)
+            self.key_map[self.key]["image"] = saved_path
 
     def save_key_map(self):
         print(self.key_map[self.key])
