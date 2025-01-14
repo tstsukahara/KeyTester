@@ -1,22 +1,8 @@
 {
     "q": {
         "image": "images/CherryMX2A-SilentRed.jpg",
-        "switch_name": "Cherry MX Red"
-    },
-    "w": {
-        "image": null,
-        "switch_name": "Cherry MX Blue"
-    },
-    "e": {
-        "image": null,
-        "switch_name": "Cherry MX Blue"
-    },
-    "r": {
-        "image": null,
-        "switch_name": "Cherry MX Blue"
-    },
-    "t": {
-        "image": null,
-        "switch_name": "Cherry MX Blue"
+        "switch_name": "Gateron MX RedX",
+        "switch_type": "Tactile",
+        "operation_force": "45g"
     }
 }
