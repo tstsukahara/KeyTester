@@ -5,9 +5,7 @@ import sys
 import json
 import os
 
-from PyQt5.QtWidgets import QHBoxLayout
-
-QWERT_KEYS = "qwert"
+QWERT_KEYS = r"1234567890-=qwertyuiop[]\asdfghjkl;'zxcvbnm,./"
 SWITCH_TYPES = ["-", "Linear", "Tactile", "Clicky", "Silent Linear", "Silent Tactile", "Silent Clicky",]
 
 class KeyTesterApp(QtWidgets.QWidget):
@@ -95,10 +93,12 @@ class KeyTesterApp(QtWidgets.QWidget):
             return {key: None for key in QWERT_KEYS}
 
     def keyPressEvent(self, event):
-        self.key = event.text().lower()
-        self.message_label.hide()
-        self.display_info()
-        self.edit_button.show()
+        key = event.text().lower()
+        if key != "" and key in QWERT_KEYS:
+            self.key = key
+            self.message_label.hide()
+            self.display_info()
+            self.edit_button.show()
 
     def display_info(self):
         # キーの表示
@@ -144,6 +144,7 @@ class KeyTesterApp(QtWidgets.QWidget):
         main_layout.addLayout(key_layout)
 
         # 画像
+        self.is_image_updated = False
         image_layout = QtWidgets.QHBoxLayout()
         image_label = QtWidgets.QLabel("Image: ")
         image_layout.addWidget(image_label)
@@ -236,7 +237,6 @@ class KeyTesterApp(QtWidgets.QWidget):
             self.key_map[self.key]["image"] = saved_path
 
     def save_key_map(self):
-        print(self.key_map[self.key])
         with open(self.config_file, "w") as file:
             json.dump(self.key_map, file, indent=4)
 
