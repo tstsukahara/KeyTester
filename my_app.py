@@ -7,6 +7,15 @@ import os
 
 QWERT_KEYS = r"1234567890-=qwertyuiop[]\asdfghjkl;'zxcvbnm,./"
 SWITCH_TYPES = ["-", "Linear", "Tactile", "Clicky", "Silent Linear", "Silent Tactile", "Silent Clicky",]
+DEFAULT_INFO = {
+    "default": {
+        "image": "",
+        "switch_name": "-",
+        "switch_type": "-",
+        "operation_force": "-",
+        "link": "-"
+    }
+}
 
 class KeyTesterApp(QtWidgets.QWidget):
     def __init__(self):
@@ -18,7 +27,7 @@ class KeyTesterApp(QtWidgets.QWidget):
         self.key = QWERT_KEYS[0]
 
         # 設定ファイルの読み込み
-        self.base_dir = "/Users/tsuyoshi/Documents/keytester"
+        self.base_dir = f'{os.environ["HOME"]}/Documents/keytester'
         self.config_file = os.path.join(self.base_dir, "key_map.json")
         self.image_dir = os.path.join(self.base_dir, "images")
         os.makedirs(self.image_dir, exist_ok=True)
@@ -87,11 +96,11 @@ class KeyTesterApp(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
     def load_key_map(self):
-        if os.path.exists(self.config_file):
-            with open(self.config_file, "r") as file:
-                return json.load(file)
-        else:
-            raise Exception(f"Config file not found: [{self.config_file}]")
+        if not os.path.exists(self.config_file):
+            with open(self.config_file, "w") as file:
+                json.dump(DEFAULT_INFO, file, indent=4)
+        with open(self.config_file, "r") as file:
+            return json.load(file)
 
     def keyPressEvent(self, event):
         key = event.text().lower()
