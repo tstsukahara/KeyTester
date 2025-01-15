@@ -90,7 +90,7 @@ class KeyTesterApp(QtWidgets.QWidget):
             with open(self.config_file, "r") as file:
                 return json.load(file)
         else:
-            return {key: None for key in QWERT_KEYS}
+            return {key: {} for key in QWERT_KEYS}
 
     def keyPressEvent(self, event):
         key = event.text().lower()
@@ -207,8 +207,13 @@ class KeyTesterApp(QtWidgets.QWidget):
             "operation_force": force_entry,
             "link": link_entry
         }
-        save_button.clicked.connect(lambda: self.update_key_map(entry_map))
+        save_button.clicked.connect(lambda: self.update_key_map(entry_map, settings_window))
         main_layout.addWidget(save_button)
+
+        # Deleteボタン
+        delete_button = QtWidgets.QPushButton("Delete", self)
+        delete_button.clicked.connect(lambda: self.clear_key_info(settings_window))
+        main_layout.addWidget(delete_button)
 
         settings_window.setLayout(main_layout)
         settings_window.exec_()
@@ -219,7 +224,7 @@ class KeyTesterApp(QtWidgets.QWidget):
         image.setText(file_path)
         self.is_image_updated = True
 
-    def update_key_map(self, entry_map):
+    def update_key_map(self, entry_map, settings_window):
         self.save_image(entry_map["image"])
         self.key_map[self.key]["switch_name"] = entry_map["switch_name"].text()
         self.key_map[self.key]["switch_type"] = entry_map["switch_type"].currentText()
@@ -228,6 +233,8 @@ class KeyTesterApp(QtWidgets.QWidget):
         self.save_key_map()
         self.display_info()
         self.message_label.hide()
+        settings_window.close()
+
 
     def save_image(self, image):
         file_path = image.text()
@@ -239,6 +246,13 @@ class KeyTesterApp(QtWidgets.QWidget):
     def save_key_map(self):
         with open(self.config_file, "w") as file:
             json.dump(self.key_map, file, indent=4)
+
+    def clear_key_info(self, settings_window):
+        self.key_map.pop(self.key)
+        self.save_key_map()
+        self.display_info()
+        settings_window.close()
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
