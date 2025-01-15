@@ -14,12 +14,13 @@ class KeyTesterApp(QtWidgets.QWidget):
         self.setWindowTitle("Key Switch Tester")
         self.setGeometry(100, 100, 300, 400)
 
-        # 表示対象のキー
+        # キーの初期化
         self.key = QWERT_KEYS[0]
 
-        # キーマッピングの保存ファイル
-        self.config_file = "key_map.json"
-        self.image_dir = "images"
+        # 設定ファイルの読み込み
+        self.base_dir = "/Users/tsuyoshi/Documents/keytester"
+        self.config_file = os.path.join(self.base_dir, "key_map.json")
+        self.image_dir = os.path.join(self.base_dir, "images")
         os.makedirs(self.image_dir, exist_ok=True)
         self.key_map = self.load_key_map()
 
@@ -90,7 +91,7 @@ class KeyTesterApp(QtWidgets.QWidget):
             with open(self.config_file, "r") as file:
                 return json.load(file)
         else:
-            return {key: {} for key in QWERT_KEYS}
+            raise Exception(f"Config file not found: [{self.config_file}]")
 
     def keyPressEvent(self, event):
         key = event.text().lower()
