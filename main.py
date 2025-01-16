@@ -156,7 +156,7 @@ class KeyTesterApp(QtWidgets.QMainWindow):
                 self.image_label.clear()
 
             # 詳細の表示
-            self.switch_name.setText(f'Name: {key_info["switch_name"]}')
+            self.switch_name.setText(f'{key_info["switch_name"]}')
             self.switch_type.setText(f'Type: {key_info["switch_type"]}')
             self.force.setText(f'Operation Force: {key_info["operation_force"]}')
             self.link.setText('<a href="{}">link</a>'.format(key_info["link"]))
