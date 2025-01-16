@@ -150,8 +150,9 @@ class KeyTesterApp(QtWidgets.QMainWindow):
             # 画像の表示
             if key_info["image"]:
                 pixmap = QtGui.QPixmap(key_info["image"])
-                scaled_pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio)
-                self.image_label.setPixmap(scaled_pixmap)
+                scaled_pixmap = pixmap.scaled(300, 300, Qt.KeepAspectRatio)
+                rounded_pixmap = create_rounded_pixmap(scaled_pixmap, 10)
+                self.image_label.setPixmap(rounded_pixmap)
             else:
                 self.image_label.clear()
 
@@ -292,6 +293,21 @@ class KeyTesterApp(QtWidgets.QMainWindow):
         self.display_info()
         settings_window.close()
 
+def create_rounded_pixmap(original_pixmap, corner_radius):
+    rounded_pixmap = QPixmap(original_pixmap.size())
+    rounded_pixmap.fill(Qt.transparent)
+
+    painter = QPainter(rounded_pixmap)
+    painter.setRenderHint(QPainter.Antialiasing)
+
+    path = QPainterPath()
+    path.addRoundedRect(QRectF(rounded_pixmap.rect()), corner_radius, corner_radius)
+
+    painter.setClipPath(path)
+    painter.drawPixmap(0, 0, original_pixmap)
+    painter.end()
+
+    return rounded_pixmap
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
