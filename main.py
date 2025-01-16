@@ -1,9 +1,11 @@
 import shutil
-from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtCore import Qt
+from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtCore import Qt, QRectF
 import sys
 import json
 import os
+
+from PyQt5.QtGui import QPixmap, QPainter, QPainterPath
 
 QWERT_KEYS = r"1234567890-=qwertyuiop[]\asdfghjkl;'zxcvbnm,./"
 SWITCH_TYPES = ["-", "Linear", "Tactile", "Clicky", "Silent Linear", "Silent Tactile", "Silent Clicky",]
@@ -17,24 +19,35 @@ DEFAULT_INFO = {
     }
 }
 
-class KeyTesterApp(QtWidgets.QWidget):
+class KeyTesterApp(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Key Switch Tester")
-        self.setGeometry(100, 100, 300, 400)
-
-        # キーの初期化
-        self.key = QWERT_KEYS[0]
+        self.setWindowTitle("KeyTester")
+        self.setGeometry(300, 200, 400, 400)
 
         # 設定ファイルの読み込み
-        self.base_dir = f'{os.environ["HOME"]}/Documents/keytester'
+        self.settings = QtCore.QSettings("KeyTester", "Settings")
+        default_base_dir = os.path.join(os.environ["HOME"], "Documents/KeyTester")
+        self.base_dir = self.settings.value("base_dir", default_base_dir)
         self.config_file = os.path.join(self.base_dir, "key_map.json")
         self.image_dir = os.path.join(self.base_dir, "images")
         os.makedirs(self.image_dir, exist_ok=True)
         self.key_map = self.load_key_map()
 
+        # メニューバーの作成
+        menubar = self.menuBar()
+        setting_menu = menubar.addMenu('Settings')
+        change_base_dir_action = QtWidgets.QAction("Change Base Directory", self)
+        change_base_dir_action.triggered.connect(self.change_base_dir)
+        setting_menu.addAction(change_base_dir_action)
+
+        # キーの初期化
+        self.key = QWERT_KEYS[0]
+
         # レイアウトの作成
-        self.main_layout = QtWidgets.QVBoxLayout()
+        central_widget = QtWidgets.QWidget()
+        self.setCentralWidget(central_widget)
+        self.main_layout = QtWidgets.QVBoxLayout(central_widget)
 
         # キー
         self.key_layout = QtWidgets.QHBoxLayout()
@@ -59,6 +72,7 @@ class KeyTesterApp(QtWidgets.QWidget):
         self.switch_name_layout = QtWidgets.QHBoxLayout()
         self.switch_name = QtWidgets.QLabel("", self)
         self.switch_name.setStyleSheet("font-weight: bold;")
+        self.switch_name.setStyleSheet("font: 20px;")
         self.switch_name.setAlignment(Qt.AlignCenter)
         self.switch_name_layout.addWidget(self.switch_name)
         self.main_layout.addLayout(self.switch_name_layout)
@@ -94,6 +108,22 @@ class KeyTesterApp(QtWidgets.QWidget):
         self.main_layout.addWidget(self.edit_button)
 
         self.setLayout(self.main_layout)
+
+    def change_base_dir(self):
+        options = QtWidgets.QFileDialog.Options()
+        new_base_dir = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory", "",
+                                                     options=options)
+        if new_base_dir:
+            print(f"{new_base_dir=}")
+            self.settings.setValue("base_dir", new_base_dir)
+            self.update_setting(new_base_dir)
+            self.key_map = self.load_key_map()
+
+    def update_setting(self, base_dir):
+        self.base_dir = base_dir
+        self.config_file = os.path.join(self.base_dir, "key_map.json")
+        self.image_dir = os.path.join(self.base_dir, "images")
+        os.makedirs(self.image_dir, exist_ok=True)
 
     def load_key_map(self):
         if not os.path.exists(self.config_file):
@@ -244,7 +274,6 @@ class KeyTesterApp(QtWidgets.QWidget):
         self.display_info()
         self.message_label.hide()
         settings_window.close()
-
 
     def save_image(self, image):
         file_path = image.text()
