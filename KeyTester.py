@@ -1,4 +1,4 @@
-"""メインモジュール"""
+"""KeyTesterアプリ"""
 
 import shutil
 from PyQt5 import QtWidgets, QtGui, QtCore
