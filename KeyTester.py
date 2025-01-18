@@ -86,23 +86,6 @@ class KeyTester(QtWidgets.QMainWindow):
 
         # self.setLayout(self.main_layout)
 
-    def change_base_dir(self):
-        """ベースディレクトリを変更する"""
-        new_base_dir = QtWidgets.QFileDialog.getExistingDirectory(
-            self, "Select Directory"
-        )
-        if new_base_dir:
-            self.settings.setValue("base_dir", new_base_dir)
-            self.update_setting(new_base_dir)
-            self.key_map = self.load_key_map()
-
-    def update_setting(self, base_dir: str) -> None:
-        """設定の更新"""
-        self.base_dir = base_dir
-        self.config_file = os.path.join(self.base_dir, CONF_FILE)
-        self.image_dir = os.path.join(self.base_dir, IMAGE_DIR)
-        os.makedirs(self.image_dir, exist_ok=True)
-
     def create_label(
         self, text, alignment=Qt.AlignCenter, bold=False, font_size=None, link=False
     ):
@@ -142,36 +125,15 @@ class KeyTester(QtWidgets.QMainWindow):
 
     def update_label_info(self, key_info):
         self.update_label(self.labels["image"], key_info.get("image"), is_image=True)
-        self.update_label(self.labels["switch_name"], key_info.get("switch_name"))
-        self.update_label(
-            self.labels["switch_type"], f"Type: {key_info.get('switch_type')}"
-        )
-        self.update_label(
-            self.labels["top_housing"], f"Top Housing: {key_info.get('top_housing')}"
-        )
-        self.update_label(
-            self.labels["bottom_housing"],
-            f"Bottom Housing: {key_info.get('bottom_housing')}",
-        )
-        self.update_label(self.labels["pin"], f"Pin: {key_info.get('pin')}")
-        self.update_label(
-            self.labels["pre_travel"], f"Pre Travel: {key_info.get('pre_travel')}"
-        )
-        self.update_label(
-            self.labels["total_travel"], f"Total Travel: {key_info.get('total_travel')}"
-        )
-        self.update_label(
-            self.labels["operation_force"],
-            f"Operation Force: {key_info.get('operation_force')}",
-        )
-        self.update_label(
-            self.labels["link"],
-            'Link: <a href="{}">url</a>'.format(key_info.get("link")),
-        )
+        for field in ["switch_name", "switch_type", "top_housing", "bottom_housing", "pin", "pre_travel", "total_travel", "operation_force"]:
+            field_title = f"{field.replace('_', ' ').title()}: " if field != "switch_name" else ''
+            self.update_label(self.labels[field], f"{field_title}{key_info.get(field)}")
+        self.update_label(self.labels["link"], f'Link: <a href="{key_info.get("link")}">url</a>')
 
     def update_label(self, label, content, is_image=False):
         """ラベルの更新"""
         if is_image:
+            label.clear()
             if os.path.exists(content):
                 pixmap = QtGui.QPixmap(content)
                 if not pixmap.isNull():
@@ -217,6 +179,12 @@ class KeyTester(QtWidgets.QMainWindow):
         self.image_path = QtWidgets.QLabel(os.path.basename(key_info["image"]))
         layout.addLayout(self.create_image_layout())
 
+        # スイッチタイプ
+        self.type_combo = QtWidgets.QComboBox()
+        self.type_combo.addItems(SWITCH_TYPES)
+        self.type_combo.setCurrentText(key_info.get("switch_type"))
+        layout.addLayout(self.create_combo_layout("Type: ", self.type_combo))
+
         # その他フィールド
         self.input_fields = {}
         for field in [
@@ -227,23 +195,12 @@ class KeyTester(QtWidgets.QMainWindow):
             "pre_travel",
             "total_travel",
             "operation_force",
+            "link"
         ]:
             self.input_fields[field], field_layout = self.create_layout_with_input(
                 f"{field.replace('_', ' ').title()}: ", key_info.get(field, "")
             )
             layout.addLayout(field_layout)
-
-        # スイッチタイプ
-        self.type_combo = QtWidgets.QComboBox()
-        self.type_combo.addItems(SWITCH_TYPES)
-        self.type_combo.setCurrentText(key_info.get("switch_type"))
-        layout.addLayout(self.create_combo_layout("Type: ", self.type_combo))
-
-        # Link
-        self.input_fields["link"], link_layout = self.create_layout_with_input(
-            "Link URL: ", key_info.get("link", "")
-        )
-        layout.addLayout(link_layout)
 
         # Saveボタン
         save_button = QtWidgets.QPushButton("Save", self)
@@ -318,3 +275,20 @@ class KeyTester(QtWidgets.QMainWindow):
         self.save_key_map()
         self.update_display_info()
         dialog.close()
+
+    def change_base_dir(self):
+        """ベースディレクトリを変更する"""
+        new_base_dir = QtWidgets.QFileDialog.getExistingDirectory(
+            self, "Select Directory"
+        )
+        if new_base_dir:
+            self.settings.setValue("base_dir", new_base_dir)
+            self.update_setting(new_base_dir)
+            self.key_map = self.load_key_map()
+
+    def update_setting(self, base_dir: str) -> None:
+        """設定の更新"""
+        self.base_dir = base_dir
+        self.config_file = os.path.join(self.base_dir, CONF_FILE)
+        self.image_dir = os.path.join(self.base_dir, IMAGE_DIR)
+        os.makedirs(self.image_dir, exist_ok=True)
