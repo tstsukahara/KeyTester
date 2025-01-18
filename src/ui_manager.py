@@ -19,7 +19,7 @@ class UIManager:
     def _setup_menu(self):
         menubar = self.parent.menuBar()
         setting_menu = menubar.addMenu("Settings")
-        change_base_dir_action = QtWidgets.QAction("Change Base Directory", self.parent)
+        change_base_dir_action = QtWidgets.QAction("Change Conf Path...", self.parent)
         change_base_dir_action.triggered.connect(self.parent.config_manager.change_base_dir)
         setting_menu.addAction(change_base_dir_action)
 
@@ -98,7 +98,7 @@ class UIManager:
         self.labels["message"].setText("No information available.")
         self.labels["message"].show()
         for label in self.labels.values():
-            if label != self.labels["message"]:
+            if not label in (self.labels["message"], self.labels["key"]):
                 label.clear()
 
     def hide_label(self, label_name):
