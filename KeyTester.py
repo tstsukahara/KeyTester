@@ -1,11 +1,10 @@
 """KeyTesterアプリ"""
 
 import shutil
-from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtCore import Qt
 import json
 import os
-
+from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
 
 from constants import (
@@ -16,7 +15,6 @@ from constants import (
     DEFAULT_INFO,
     SWITCH_TYPES,
 )
-
 
 class KeyTester(QtWidgets.QMainWindow):
     def __init__(self):
@@ -60,20 +58,21 @@ class KeyTester(QtWidgets.QMainWindow):
 
     def setup_labels(self):
         """ラベル作成"""
-        self.labels = {
-            "key": self.create_label(""),
-            "message": self.create_label("Press any key."),
-            "image": self.create_label(""),
-            "switch_name": self.create_label("", bold=True, font_size=20),
-            "switch_type": self.create_label(""),
-            "top_housing": self.create_label(""),
-            "bottom_housing": self.create_label(""),
-            "pin": self.create_label(""),
-            "pre_travel": self.create_label(""),
-            "total_travel": self.create_label(""),
-            "operation_force": self.create_label(""),
-            "link": self.create_label("", link=True),
+        label_configs = {
+            "key": {"text": ""},
+            "message": {"text": "Press any key."},
+            "image": {"text": ""},
+            "switch_name": {"text": "", "bold": True, "font_size": 20},
+            "switch_type": {"text": ""},
+            "top_housing": {"text": ""},
+            "bottom_housing": {"text": ""},
+            "pin": {"text": ""},
+            "pre_travel": {"text": ""},
+            "total_travel": {"text": ""},
+            "operation_force": {"text": ""},
+            "link": {"text": "", "link": True},
         }
+        self.labels = {key: self.create_label(**config) for key, config in label_configs.items()}
         for label in self.labels.values():
             self.main_layout.addWidget(label)
 
@@ -84,11 +83,7 @@ class KeyTester(QtWidgets.QMainWindow):
         self.edit_button.hide()
         self.main_layout.addWidget(self.edit_button)
 
-        # self.setLayout(self.main_layout)
-
-    def create_label(
-        self, text, alignment=Qt.AlignCenter, bold=False, font_size=None, link=False
-    ):
+    def create_label(self, text, alignment=Qt.AlignCenter, bold=False, font_size=None, link=False):
         """ラベル生成ヘルパー"""
         label = QtWidgets.QLabel(text, self)
         label.setAlignment(alignment)
@@ -117,7 +112,7 @@ class KeyTester(QtWidgets.QMainWindow):
     def update_display_info(self):
         """表示する情報を更新する"""
         self.labels["key"].setText(f"Key: {self.key}")
-        key_info = self.key_map.get(self.key, None)
+        key_info = self.key_map.get(self.key)
         if key_info:
             self.update_label_info(key_info)
         else:
