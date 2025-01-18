@@ -48,10 +48,12 @@ class KeyTester(QtWidgets.QMainWindow):
         self.key_label = self.create_label("", Qt.AlignCenter)
         self.message_label = self.create_label("Press any key.", Qt.AlignCenter)
         self.image_label = self.create_label("", Qt.AlignCenter)
-        self.switch_name = self.create_label("", Qt.AlignCenter, bold=True, font_size=20)
-        self.switch_type = self.create_label("", Qt.AlignCenter)
-        self.force = self.create_label("", Qt.AlignCenter)
-        self.link = self.create_label("", Qt.AlignCenter, link=True)
+        self.switch_name_label = self.create_label("", Qt.AlignCenter, bold=True, font_size=20)
+        self.switch_type_label = self.create_label("", Qt.AlignCenter)
+        self.top_housing_label = self.create_label("", Qt.AlignCenter)
+        self.bottom_housing_label = self.create_label("", Qt.AlignCenter)
+        self.force_label = self.create_label("", Qt.AlignCenter)
+        self.link_label = self.create_label("", Qt.AlignCenter, link=True)
 
         self.is_image_updated = False
 
@@ -65,10 +67,12 @@ class KeyTester(QtWidgets.QMainWindow):
             self.key_label,
             self.message_label,
             self.image_label,
-            self.switch_name,
-            self.switch_type,
-            self.force,
-            self.link,
+            self.switch_name_label,
+            self.switch_type_label,
+            self.top_housing_label,
+            self.bottom_housing_label,
+            self.force_label,
+            self.link_label,
             self.edit_button,
         ]:
             self.main_layout.addWidget(widget)
@@ -116,24 +120,26 @@ class KeyTester(QtWidgets.QMainWindow):
         if key != "" and key in VALID_KEYS:
             self.key = key
             self.message_label.hide()
-            self.display_info()
+            self.update_display_info()
             self.edit_button.show()
 
-    def display_info(self):
-        """キースイッチの情報を表示する"""
-        # キーの表示
+    def update_display_info(self):
+        """表示する情報を更新する"""
         self.key_label.setText(f"Key: {self.key}")
         key_info = self.key_map.get(self.key, None)
 
         if key_info:
             self.update_label(self.image_label, key_info.get("image"), is_image=True)
-            self.update_label(self.switch_name, key_info.get("switch_name"))
-            self.update_label(self.switch_type, f"Type: {key_info.get('switch_type')}")
-            self.update_label(self.force, f"Operation Force: {key_info.get('operation_force')}")
-            link_url = key_info.get("link")
-            self.update_label(self.link, 'Link: <a href="{}">url</a>'.format(key_info.get("link")))
+            self.update_label(self.switch_name_label, key_info.get("switch_name"))
+            self.update_label(self.switch_type_label, f"Type: {key_info.get('switch_type')}")
+            self.update_label(self.top_housing_label, f"Top Housing: {key_info.get('top_housing')}")
+            self.update_label(self.bottom_housing_label, f"Bottom Housing: {key_info.get('bottom_housing')}")
+            self.update_label(self.force_label, f"Operation Force: {key_info.get('operation_force')}")
+            self.update_label(self.link_label, 'Link: <a href="{}">url</a>'.format(key_info.get("link")))
         else:
             self.clear_info()
+
+
 
     def update_label(self, label, content, is_image=False):
         """ラベルの更新"""
@@ -147,7 +153,15 @@ class KeyTester(QtWidgets.QMainWindow):
         """キースイッチ情報のクリア"""
         self.message_label.setText("No information available.")
         self.message_label.show()
-        for label in [self.image_label, self.switch_name, self.switch_type, self.force, self.link]:
+        for label in [
+            self.image_label,
+            self.switch_name_label,
+            self.switch_type_label,
+            self.top_housing_label,
+            self.bottom_housing_label,
+            self.force_label,
+            self.link_label
+        ]:
             label.clear()
 
     def load_key_map(self) -> dict[str, str]:
@@ -197,15 +211,31 @@ class KeyTester(QtWidgets.QMainWindow):
         type_layout.addWidget(type_label)
         type_combo = QtWidgets.QComboBox()
         type_combo.addItems(SWITCH_TYPES)
-        type_combo.setCurrentText(self.key_map[self.key]["switch_type"])
+        type_combo.setCurrentText(self.key_map.get(self.key).get("switch_type"))
         type_layout.addWidget(type_combo)
+
+        # トップハウジング
+        top_housing_layout = QtWidgets.QHBoxLayout()
+        top_housing_label = QtWidgets.QLabel("Top Housing: ")
+        top_housing_layout.addWidget(top_housing_label)
+        top_housing_input = QtWidgets.QLineEdit(self)
+        top_housing_input.setText(self.key_map.get(self.key).get("top_housing"))
+        top_housing_layout.addWidget(top_housing_input)
+
+        # ボトムハウジング
+        bottom_housing_layout = QtWidgets.QHBoxLayout()
+        bottom_housing_label = QtWidgets.QLabel("Bottom Housing: ")
+        bottom_housing_layout.addWidget(bottom_housing_label)
+        bottom_housing_input = QtWidgets.QLineEdit(self)
+        bottom_housing_input.setText(self.key_map.get(self.key).get("bottom_housing"))
+        bottom_housing_layout.addWidget(bottom_housing_input)
 
         # 押下圧
         force_layout = QtWidgets.QHBoxLayout()
         force_label = QtWidgets.QLabel("Operation Force: ")
         force_layout.addWidget(force_label)
         force_input = QtWidgets.QLineEdit(self)
-        force_input.setText(self.key_map[self.key]["operation_force"])
+        force_input.setText(self.key_map.get(self.key).get("operation_force"))
         force_layout.addWidget(force_input)
 
         # Link
@@ -213,7 +243,7 @@ class KeyTester(QtWidgets.QMainWindow):
         link_label = QtWidgets.QLabel("Link URL:  ")
         link_layout.addWidget(link_label)
         link_input = QtWidgets.QLineEdit(self)
-        link_input.setText(self.key_map[self.key]["link"])
+        link_input.setText(self.key_map.get(self.key).get("link"))
         link_layout.addWidget(link_input)
 
         # Saveボタン
@@ -222,6 +252,8 @@ class KeyTester(QtWidgets.QMainWindow):
             "image": image_path,
             "switch_name": name_input,
             "switch_type": type_combo,
+            "top_housing": top_housing_input,
+            "bottom_housing": bottom_housing_input,
             "operation_force": force_input,
             "link": link_input,
         }
@@ -239,6 +271,8 @@ class KeyTester(QtWidgets.QMainWindow):
             image_layout,
             name_layout,
             type_layout,
+            top_housing_layout,
+            bottom_housing_layout,
             force_layout,
             link_layout
         ]:
@@ -267,10 +301,12 @@ class KeyTester(QtWidgets.QMainWindow):
         self.save_image(entry_map["image"])
         self.key_map[self.key]["switch_name"] = entry_map["switch_name"].text()
         self.key_map[self.key]["switch_type"] = entry_map["switch_type"].currentText()
+        self.key_map[self.key]["top_housing"] = entry_map["top_housing"].text()
+        self.key_map[self.key]["bottom_housing"] = entry_map["bottom_housing"].text()
         self.key_map[self.key]["operation_force"] = entry_map["operation_force"].text()
         self.key_map[self.key]["link"] = entry_map["link"].text()
         self.save_key_map()
-        self.display_info()
+        self.update_display_info()
         self.message_label.hide()
         settings_window.close()
 
@@ -291,5 +327,5 @@ class KeyTester(QtWidgets.QMainWindow):
         """キーマップを削除する"""
         self.key_map.pop(self.key)
         self.save_key_map()
-        self.display_info()
+        self.update_display_info()
         dialog.close()
