@@ -1,9 +1,9 @@
 import os
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
-from constants import SWITCH_TYPES, FIELDS
+from constants import SWITCH_TYPES, FIELDS, DEFAULT_INFO
 
 
 class EditSwitchDialog(QtWidgets.QDialog):
@@ -63,10 +63,39 @@ class EditSwitchDialog(QtWidgets.QDialog):
         cancel_button.clicked.connect(self.accept)
         self.layout.addWidget(cancel_button)
 
+        # 区切り線
+        line = QtWidgets.QFrame()
+        line.setFrameShape(QtWidgets.QFrame.HLine)
+        line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.layout.addWidget(line)
+
         # Newボタン
         new_button = QtWidgets.QPushButton("Create New", self)
-        new_button.clicked.connect(self.accept)
+        new_button.clicked.connect(self._create_new)
         self.layout.addWidget(new_button)
+
+    def _create_new(self):
+        # 新しいスイッチ名の入力を求める
+        new_name, ok = QInputDialog.getText(self, 'New Switch', 'Enter new switch name:')
+        if ok and new_name:
+            if new_name in self.switch_names:
+                QMessageBox.warning(self, "Warning", "This switch name already exists.")
+                return
+
+            # 新しいスイッチ情報を初期化
+            self.switch_info[new_name] = DEFAULT_INFO
+
+            # 新しいスイッチ名を追加
+            self.switch_names.append(new_name)
+            self.current_switch_name = new_name
+            self.switch_name_combo.addItem(new_name)
+            self.switch_name_combo.setCurrentText(new_name)
+
+            # フィールドをクリア
+            self.image_path.setText("")
+            self.type_combo.setCurrentIndex(0)
+            for field, widget in self.fields.items():
+                widget.setText("")
 
     def _on_switch_name_changed(self, index):
         self.current_switch_name = self.switch_names[index]
