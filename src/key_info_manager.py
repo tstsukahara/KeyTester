@@ -30,7 +30,7 @@ class KeyInfoManager:
 
     def save_image(self, file_path):
         if file_path and os.path.exists(file_path):
-            saved_path = os.path.join(self.parent.config_manager.image_dir, os.path.basename(file_path))
+            saved_path = os.path.join(self.parent.config_manager.get_image_dir(), os.path.basename(file_path))
             shutil.copy(file_path, saved_path)
             return saved_path
         return None

@@ -39,3 +39,6 @@ class ConfigManager:
         self.config_file = os.path.join(self.base_dir, CONF_FILE)
         self.image_dir = os.path.join(self.base_dir, IMAGE_DIR)
         os.makedirs(self.image_dir, exist_ok=True)
+
+    def get_image_dir(self):
+        return self.image_dir

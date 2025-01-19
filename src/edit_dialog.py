@@ -65,7 +65,7 @@ class EditDialog(QtWidgets.QDialog):
 
         new_image_path = self.parent.key_info_manager.save_image(self.image_path.text())
         if new_image_path:
-            self.key_info["image"] = new_image_path
+            self.key_info["image"] = os.path.basename(new_image_path)
 
         self.parent.key_info_manager.update_key_info(self.key, self.key_info)
         self.parent.ui_manager.update_display_info(self.key, self.key_info)

@@ -85,8 +85,9 @@ class UIManager:
     def _update_label(self, label, content, is_image=False):
         if is_image:
             label.clear()
-            if os.path.exists(content):
-                pixmap = QtGui.QPixmap(content)
+            image_path = os.path.join(self.parent.config_manager.get_image_dir(), content)
+            if os.path.exists(image_path):
+                pixmap = QtGui.QPixmap(image_path)
                 if not pixmap.isNull():
                     label.setPixmap(pixmap.scaled(200, 200, Qt.KeepAspectRatio))
         else:
