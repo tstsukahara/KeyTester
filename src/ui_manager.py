@@ -22,9 +22,14 @@ class UIManager:
     def _setup_menu(self):
         menubar = self.parent.menuBar()
         setting_menu = menubar.addMenu("Settings")
-        change_base_dir_action = QtWidgets.QAction("Change Conf Path...", self.parent)
+
+        change_base_dir_action = QtWidgets.QAction("Change Base Directory...", self.parent)
         change_base_dir_action.triggered.connect(self.parent.config_manager.change_base_dir)
         setting_menu.addAction(change_base_dir_action)
+
+        edit_switch_info_action = QtWidgets.QAction("Edit Switch Info...", self.parent)
+        edit_switch_info_action.triggered.connect(self.parent.open_switch_edit)
+        setting_menu.addAction(edit_switch_info_action)
 
     def _setup_main_layout(self):
         central_widget = QtWidgets.QWidget()
@@ -45,8 +50,8 @@ class UIManager:
             self.main_layout.addWidget(self.labels[key])
 
     def _setup_edit_button(self):
-        self.edit_button = QtWidgets.QPushButton("Edit", self.parent)
-        self.edit_button.clicked.connect(self.parent.open_edit)
+        self.edit_button = QtWidgets.QPushButton("Change", self.parent)
+        self.edit_button.clicked.connect(self.parent.open_change_dialog)
         self.edit_button.hide()
         self.main_layout.addWidget(self.edit_button)
 
@@ -68,10 +73,10 @@ class UIManager:
 
     def update_display_info(self, key, key_info):
         self.labels["key"].setText(f"Key: {key}")
-        if key_info:
+        if key and key_info:
             self._update_label_info(key_info)
         else:
-            self._clear_labels()
+            self._clear_labels(key)
 
     def _update_label_info(self, key_info):
         self._update_label(self.labels["image"], key_info.get("image"), is_image=True)
@@ -93,12 +98,16 @@ class UIManager:
         else:
             label.setText(content or "")
 
-    def _clear_labels(self):
-        self.labels["message"].setText("No information available.")
-        self.labels["message"].show()
+    def _clear_labels(self, key):
         for label in self.labels.values():
             if not label in (self.labels["message"], self.labels["key"]):
                 label.clear()
+        if key:
+            self.labels["message"].setText("No information available.")
+            self.labels["message"].show()
+        else:
+            self.labels["message"].setText("Press any key.")
+            self.labels["key"].hide()
 
     def hide_label(self, label_name):
         self.labels[label_name].hide()

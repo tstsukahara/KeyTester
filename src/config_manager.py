@@ -3,7 +3,7 @@ import os
 
 from PyQt5 import QtCore, QtWidgets
 
-from constants import DEFAULT_BASE_DIR, CONF_FILE, IMAGE_DIR
+from constants import DEFAULT_BASE_DIR, KEY_MAP_FILE, IMAGE_DIR, SWITCH_FILE
 
 
 class ConfigManager:
@@ -11,19 +11,30 @@ class ConfigManager:
         self.parent = parent
         self.settings = QtCore.QSettings("KeyTester", "Settings")
         self.base_dir = self.settings.value("base_dir", DEFAULT_BASE_DIR)
-        self.config_file = os.path.join(self.base_dir, CONF_FILE)
+        self.key_map_file = os.path.join(self.base_dir, KEY_MAP_FILE)
+        self.switch_file = os.path.join(self.base_dir, SWITCH_FILE)
         self.image_dir = os.path.join(self.base_dir, IMAGE_DIR)
         os.makedirs(self.image_dir, exist_ok=True)
 
     def load_key_map_file(self):
-        if os.path.exists(self.config_file):
-            with open(self.config_file, "r") as file:
+        if os.path.exists(self.key_map_file):
+            with open(self.key_map_file, "r") as file:
+                return json.load(file)
+        return {}
+
+    def load_switch_file(self):
+        if os.path.exists(self.switch_file):
+            with open(self.switch_file, "r") as file:
                 return json.load(file)
         return {}
 
     def save_key_map_file(self, key_map):
-        with open(self.config_file, "w") as file:
+        with open(self.key_map_file, "w") as file:
             json.dump(key_map, file, indent=4)
+
+    def save_switch_file(self, switch_info):
+        with open(self.switch_file, "w") as file:
+            json.dump(switch_info, file, indent=4)
 
     def change_base_dir(self):
         new_base_dir = QtWidgets.QFileDialog.getExistingDirectory(
@@ -34,9 +45,15 @@ class ConfigManager:
             self._update_setting(new_base_dir)
             self.parent.key_info_manager.set_key_map(self.load_key_map_file())
 
+    def edit_switch_info(self):
+        key_info = self.key_info_manager.get_key_map().get(key, DEFAULT_INFO.copy())
+        dialog = EditDialog(self, self.parent.switch_info_manager.get_switch_info())
+        dialog.exec_()
+
     def _update_setting(self, base_dir):
         self.base_dir = base_dir
-        self.config_file = os.path.join(self.base_dir, CONF_FILE)
+        self.key_map_file = os.path.join(self.base_dir, KEY_MAP_FILE)
+        self.switch_file = os.path.join(self.base_dir, SWITCH_FILE)
         self.image_dir = os.path.join(self.base_dir, IMAGE_DIR)
         os.makedirs(self.image_dir, exist_ok=True)
 

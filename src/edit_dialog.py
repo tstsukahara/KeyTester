@@ -67,12 +67,12 @@ class EditDialog(QtWidgets.QDialog):
         if new_image_path:
             self.key_info["image"] = os.path.basename(new_image_path)
 
-        self.parent.key_info_manager.update_key_info(self.key, self.key_info)
+        self.parent.key_info_manager.update_key_map(self.key, self.key_info)
         self.parent.ui_manager.update_display_info(self.key, self.key_info)
         self.accept()
 
     def _delete(self):
-        self.parent.key_info_manager.delete_key_info(self.key)
+        self.parent.key_info_manager.delete_key_map(self.key)
         self.parent.ui_manager.update_display_info(self.key, None)
         self.accept()
 

@@ -2,7 +2,8 @@
 import os
 
 DEFAULT_BASE_DIR = os.path.join(os.environ["HOME"], "Documents/KeyTester")
-CONF_FILE = "key_map.json"
+KEY_MAP_FILE = "key_map.json"
+SWITCH_FILE = "switch.json"
 IMAGE_DIR = "images"
 VALID_KEYS = r"1234567890-=qwertyuiop[]\asdfghjkl;'zxcvbnm,./"
 SWITCH_TYPES = ["-", "Linear", "Tactile", "Clicky", "Silent Linear", "Silent Tactile", "Silent Clicky",]

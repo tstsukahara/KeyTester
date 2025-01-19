@@ -2,10 +2,11 @@ import os
 import shutil
 
 
-class KeyInfoManager:
+class KeyMapManager:
     def __init__(self, parent):
         self.parent = parent
         self.key_map = self.parent.config_manager.load_key_map_file()
+        self.switch_info = self.parent.config_manager.load_switch_file()
         self.current_key = None
 
     def get_current_key(self):
@@ -20,11 +21,11 @@ class KeyInfoManager:
     def set_key_map(self, key_map):
         self.key_map = key_map
 
-    def update_key_info(self, key, key_info):
+    def update_key_map(self, key, key_info):
         self.key_map[key] = key_info
         self.parent.config_manager.save_key_map_file(self.key_map)
 
-    def delete_key_info(self, key):
+    def delete_key_map(self, key):
         self.key_map.pop(key, None)
         self.parent.config_manager.save_key_map_file(self.key_map)
 
