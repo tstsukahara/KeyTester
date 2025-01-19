@@ -14,6 +14,7 @@ class EditSwitchDialog(QtWidgets.QDialog):
         self.switch_info = self.parent.switch_info_manager.get_switch_info()
         self.switch_names = list(self.switch_info.keys())
         self.current_switch_name = list(self.switch_info.keys())[0]
+        self.last_opened_directory = os.path.join(os.environ["HOME"], "Downloads")
         self.labels = {}
         self._setup_ui()
 
@@ -132,9 +133,10 @@ class EditSwitchDialog(QtWidgets.QDialog):
 
     def _choose_image(self):
         file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, "Select Image", "", "Images (*.png *.jpg *.jpeg)"
+            self, "Select Image", self.last_opened_directory, "Images (*.png *.jpg *.jpeg)"
         )
         if file_path:
+            self.last_opened_directory = '/'.join(file_path.split('/')[:-1])
             self.image_path.setText(file_path)
 
     def _save(self):
@@ -171,6 +173,7 @@ class EditSwitchDialog(QtWidgets.QDialog):
 
         self.switch_name_combo.setDisabled(False)
         self.delete_button.show()
+        self.close_button.show()
         self.new_button.show()
         self.cancel_button.hide()
 

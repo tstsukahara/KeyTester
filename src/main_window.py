@@ -2,8 +2,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QKeyEvent
 
 from config_manager import ConfigManager
-from constants import VALID_KEYS, DEFAULT_INFO
-from edit_dialog import EditDialog
+from constants import VALID_KEYS
 from key_map_manager import KeyMapManager
 from src.change_dialog import ChangeDialog
 from src.edit_switch_dialog import EditSwitchDialog
