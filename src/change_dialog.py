@@ -35,6 +35,11 @@ class ChangeDialog(QtWidgets.QDialog):
         delete_button.clicked.connect(self._show_confirm)
         layout.addWidget(delete_button)
 
+        # Cancelボタン
+        cancel_button = QtWidgets.QPushButton("Cancel", self)
+        cancel_button.clicked.connect(self.accept)
+        layout.addWidget(cancel_button)
+
     def _save(self):
         self._update_switch_name()
         self.parent.key_info_manager.update_key_map(self.key, self.switch_name)
