@@ -16,7 +16,6 @@ class EditSwitchDialog(QtWidgets.QDialog):
         self.current_switch_name = list(self.switch_info.keys())[0]
         self.labels = {}
         self._setup_ui()
-        self.new_switch_added = False
 
     def _setup_ui(self):
         self.setWindowTitle("Edit Switch Information")
@@ -49,6 +48,12 @@ class EditSwitchDialog(QtWidgets.QDialog):
             )
             self.layout.addLayout(field_layout)
 
+        # 区切り線
+        line = QtWidgets.QFrame()
+        line.setFrameShape(QtWidgets.QFrame.HLine)
+        line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.layout.addWidget(line)
+
         # Saveボタン
         self.save_button = QtWidgets.QPushButton("Save", self)
         self.save_button.clicked.connect(self._save)
@@ -59,32 +64,34 @@ class EditSwitchDialog(QtWidgets.QDialog):
         self.delete_button.clicked.connect(self._show_confirm)
         self.layout.addWidget(self.delete_button)
 
-        # Cancelボタン
-        cancel_button = QtWidgets.QPushButton("Cancel", self)
-        cancel_button.clicked.connect(self._clear_switch_name_and_accept)
-        self.layout.addWidget(cancel_button)
-
-        # 区切り線
-        line = QtWidgets.QFrame()
-        line.setFrameShape(QtWidgets.QFrame.HLine)
-        line.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.layout.addWidget(line)
-
         # Newボタン
         self.new_button = QtWidgets.QPushButton("Create New", self)
         self.new_button.clicked.connect(self._create_new)
         self.layout.addWidget(self.new_button)
 
+        # Cancelボタン
+        self.cancel_button = QtWidgets.QPushButton("Cancel", self)
+        self.cancel_button.clicked.connect(self._cancel)
+        self.layout.addWidget(self.cancel_button)
+        self.cancel_button.hide()
+
+        # Closeボタン
+        self.close_button = QtWidgets.QPushButton("Close", self)
+        self.close_button.clicked.connect(self._close)
+        self.layout.addWidget(self.close_button)
+
+
+
     def _create_new(self):
         # 新しいスイッチ名の入力を求める
         new_name, ok = QInputDialog.getText(self, 'New Switch', 'Enter new switch name:')
         if ok and new_name:
-            self.new_switch_added = True
             if new_name in self.switch_names:
                 QMessageBox.warning(self, "Warning", "This switch name already exists.")
                 return
             # 新しいスイッチ情報を初期化
             self.switch_info[new_name] = DEFAULT_INFO
+            self.switch_info[new_name]["switch_name"] = new_name
             self.switch_names.append(new_name)
             self.current_switch_name = new_name
             self.switch_name_combo.addItem(new_name)
@@ -95,8 +102,11 @@ class EditSwitchDialog(QtWidgets.QDialog):
             for field, widget in self.fields.items():
                 widget.setText("")
 
+            self.switch_name_combo.setDisabled(True)
             self.delete_button.hide()
             self.new_button.hide()
+            self.close_button.hide()
+            self.cancel_button.show()
 
     def _on_switch_name_changed(self, index):
         self.current_switch_name = self.switch_names[index]
@@ -140,18 +150,33 @@ class EditSwitchDialog(QtWidgets.QDialog):
 
         self.parent.switch_info_manager.update_switch_info(self.current_switch_name, self.switch_info.get(self.current_switch_name))
         self.parent.ui_manager.update_display_info(self.key, self.switch_info.get(self.current_switch_name))
-        self.accept()
+
+        self.switch_name_combo.setDisabled(False)
+        self.delete_button.show()
+        self.close_button.show()
+        self.new_button.show()
+        self.cancel_button.hide()
 
     def _delete(self):
         self.parent.switch_info_manager.delete_switch_info(self.current_switch_name)
+        self.switch_names.remove(self.current_switch_name)
+        self.switch_name_combo.removeItem(self.switch_name_combo.findText(self.current_switch_name))
         self.parent.ui_manager.update_display_info(self.key, None)
-        self.accept()
 
-    def _clear_switch_name_and_accept(self):
-        if self.new_switch_added:
-            self.switch_names.remove(self.current_switch_name)
-            del self.switch_info[self.current_switch_name]
-            self.current_switch_name = self.switch_names[0]
+    def _cancel(self):
+        self.switch_names.remove(self.current_switch_name)
+        self.parent.switch_info_manager.delete_switch_info(self.current_switch_name)
+        self.switch_name_combo.removeItem(self.switch_name_combo.findText(self.current_switch_name))
+        self.switch_name_combo.setCurrentText(self.current_switch_name)
+
+        self.switch_name_combo.setDisabled(False)
+        self.delete_button.show()
+        self.new_button.show()
+        self.cancel_button.hide()
+
+    def _close(self):
+        self.current_switch_name = self.switch_names[0]
+        self.switch_name_combo.setCurrentText(self.current_switch_name)
         self.accept()
 
     def _create_image_layout(self):
