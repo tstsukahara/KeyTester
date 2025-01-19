@@ -7,15 +7,16 @@ from constants import SWITCH_TYPES, FIELDS, DEFAULT_INFO
 
 
 class EditSwitchDialog(QtWidgets.QDialog):
-    def __init__(self, parent, key, switch_info):
+    def __init__(self, parent, key):
         super().__init__(parent)
         self.parent = parent
         self.key = key
-        self.switch_info = switch_info
+        self.switch_info = self.parent.switch_info_manager.get_switch_info()
         self.switch_names = list(self.switch_info.keys())
         self.current_switch_name = list(self.switch_info.keys())[0]
         self.labels = {}
         self._setup_ui()
+        self.new_switch_added = False
 
     def _setup_ui(self):
         self.setWindowTitle("Edit Switch Information")
@@ -49,18 +50,18 @@ class EditSwitchDialog(QtWidgets.QDialog):
             self.layout.addLayout(field_layout)
 
         # Saveボタン
-        save_button = QtWidgets.QPushButton("Save", self)
-        save_button.clicked.connect(self._save)
-        self.layout.addWidget(save_button)
+        self.save_button = QtWidgets.QPushButton("Save", self)
+        self.save_button.clicked.connect(self._save)
+        self.layout.addWidget(self.save_button)
 
         # Deleteボタン
-        delete_button = QtWidgets.QPushButton("Delete", self)
-        delete_button.clicked.connect(self._show_confirm)
-        self.layout.addWidget(delete_button)
+        self.delete_button = QtWidgets.QPushButton("Delete", self)
+        self.delete_button.clicked.connect(self._show_confirm)
+        self.layout.addWidget(self.delete_button)
 
         # Cancelボタン
         cancel_button = QtWidgets.QPushButton("Cancel", self)
-        cancel_button.clicked.connect(self.accept)
+        cancel_button.clicked.connect(self._clear_switch_name_and_accept)
         self.layout.addWidget(cancel_button)
 
         # 区切り線
@@ -70,32 +71,32 @@ class EditSwitchDialog(QtWidgets.QDialog):
         self.layout.addWidget(line)
 
         # Newボタン
-        new_button = QtWidgets.QPushButton("Create New", self)
-        new_button.clicked.connect(self._create_new)
-        self.layout.addWidget(new_button)
+        self.new_button = QtWidgets.QPushButton("Create New", self)
+        self.new_button.clicked.connect(self._create_new)
+        self.layout.addWidget(self.new_button)
 
     def _create_new(self):
         # 新しいスイッチ名の入力を求める
         new_name, ok = QInputDialog.getText(self, 'New Switch', 'Enter new switch name:')
         if ok and new_name:
+            self.new_switch_added = True
             if new_name in self.switch_names:
                 QMessageBox.warning(self, "Warning", "This switch name already exists.")
                 return
-
             # 新しいスイッチ情報を初期化
             self.switch_info[new_name] = DEFAULT_INFO
-
-            # 新しいスイッチ名を追加
             self.switch_names.append(new_name)
             self.current_switch_name = new_name
             self.switch_name_combo.addItem(new_name)
             self.switch_name_combo.setCurrentText(new_name)
-
             # フィールドをクリア
             self.image_path.setText("")
             self.type_combo.setCurrentIndex(0)
             for field, widget in self.fields.items():
                 widget.setText("")
+
+            self.delete_button.hide()
+            self.new_button.hide()
 
     def _on_switch_name_changed(self, index):
         self.current_switch_name = self.switch_names[index]
@@ -104,10 +105,8 @@ class EditSwitchDialog(QtWidgets.QDialog):
     def _update_display(self):
         # 画像の更新
         self.image_path.setText(os.path.basename(self.switch_info.get(self.current_switch_name).get("image")))
-
         # スイッチタイプの更新
         self.type_combo.setCurrentText(self.switch_info.get(self.current_switch_name).get("switch_type"))
-
         # その他フィールドの更新
         for field, widget in self.fields.items():
             widget.setText(self.switch_info.get(self.current_switch_name).get(field, ""))
@@ -146,6 +145,13 @@ class EditSwitchDialog(QtWidgets.QDialog):
     def _delete(self):
         self.parent.switch_info_manager.delete_switch_info(self.current_switch_name)
         self.parent.ui_manager.update_display_info(self.key, None)
+        self.accept()
+
+    def _clear_switch_name_and_accept(self):
+        if self.new_switch_added:
+            self.switch_names.remove(self.current_switch_name)
+            del self.switch_info[self.current_switch_name]
+            self.current_switch_name = self.switch_names[0]
         self.accept()
 
     def _create_image_layout(self):

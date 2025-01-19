@@ -33,7 +33,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def open_switch_edit(self):
         key = self.key_info_manager.get_current_key()
-        dialog = EditSwitchDialog(self, key, self.switch_info_manager.get_switch_info())
+        dialog = EditSwitchDialog(self, key)
         dialog.exec_()
 
     def open_change_dialog(self):
