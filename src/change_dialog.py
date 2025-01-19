@@ -16,6 +16,7 @@ class ChangeDialog(QtWidgets.QDialog):
 
     def _setup_ui(self):
         self.setWindowTitle("Change Switch")
+        self.setGeometry(450, 300, 100, 100)
         layout = QtWidgets.QVBoxLayout(self)
 
         self.select_box = QtWidgets.QComboBox()

@@ -19,12 +19,14 @@ class EditSwitchDialog(QtWidgets.QDialog):
 
     def _setup_ui(self):
         self.setWindowTitle("Edit Switch Information")
+        self.setGeometry(600, 300, 400, 400)
         self.layout = QtWidgets.QVBoxLayout(self)
 
         # スイッチ名
         self.switch_name_combo = QtWidgets.QComboBox()
         self.switch_name_combo.addItems(self.switch_names)
         self.switch_name_combo.setCurrentText(self.current_switch_name)
+        self.switch_name_combo.currentIndexChanged.connect(self._on_switch_name_changed)
         self.layout.addLayout(self._create_combo_layout("Switch Name: ", self.switch_name_combo))
 
         # 画像
@@ -66,9 +68,20 @@ class EditSwitchDialog(QtWidgets.QDialog):
         new_button.clicked.connect(self.accept)
         self.layout.addWidget(new_button)
 
-    def _on_switch_name_combo_changed(self, index):
+    def _on_switch_name_changed(self, index):
         self.current_switch_name = self.switch_names[index]
         self._update_display()
+
+    def _update_display(self):
+        # 画像の更新
+        self.image_path.setText(os.path.basename(self.switch_info.get(self.current_switch_name).get("image")))
+
+        # スイッチタイプの更新
+        self.type_combo.setCurrentText(self.switch_info.get(self.current_switch_name).get("switch_type"))
+
+        # その他フィールドの更新
+        for field, widget in self.fields.items():
+            widget.setText(self.switch_info.get(self.current_switch_name).get(field, ""))
 
     def _show_check_dialog(self):
         # 確認ダイアログの表示
