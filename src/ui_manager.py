@@ -3,6 +3,9 @@ import os
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 
+from src.constants import FIELDS
+
+
 class UIManager:
     def __init__(self, parent):
         self.parent = parent
@@ -29,20 +32,14 @@ class UIManager:
         self.main_layout = QtWidgets.QVBoxLayout(central_widget)
 
     def _setup_labels(self):
-        label_configs = {
-            "key": {"text": ""},
-            "message": {"text": "Press any key."},
-            "image": {"text": ""},
-            "switch_name": {"text": "", "bold": True, "font_size": 20},
-            "switch_type": {"text": ""},
-            "top_housing": {"text": ""},
-            "bottom_housing": {"text": ""},
-            "pin": {"text": ""},
-            "pre_travel": {"text": ""},
-            "total_travel": {"text": ""},
-            "operation_force": {"text": ""},
-            "link": {"text": "", "link": True},
-        }
+        label_configs = {}
+        label_configs["key"] = {"text": ""}
+        label_configs["message"] = {"text": "Press any key."}
+        for field in FIELDS:
+            label_configs[field] = {"text": ""}
+        label_configs["switch_name"] = {"text": "", "bold": True, "font_size": 20}
+        label_configs["link"] = {"text": "", "link": True}
+
         for key, config in label_configs.items():
             self.labels[key] = self._create_label(**config)
             self.main_layout.addWidget(self.labels[key])
@@ -78,8 +75,9 @@ class UIManager:
 
     def _update_label_info(self, key_info):
         self._update_label(self.labels["image"], key_info.get("image"), is_image=True)
-        for field in ["switch_name", "switch_type", "top_housing", "bottom_housing", "pin", "pre_travel",
-                      "total_travel", "operation_force"]:
+
+        exclude_fields = ["image"]
+        for field in filter(lambda f: f not in exclude_fields, FIELDS):
             field_title = f"{field.replace('_', ' ').title()}: " if field != "switch_name" else ''
             self._update_label(self.labels[field], f"{field_title}{key_info.get(field)}")
         self._update_label(self.labels["link"], f'Link: <a href="{key_info.get("link")}">url</a>')

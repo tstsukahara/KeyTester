@@ -2,7 +2,7 @@ import os
 
 from PyQt5 import QtWidgets
 
-from constants import SWITCH_TYPES
+from constants import SWITCH_TYPES, FIELDS
 
 
 class EditDialog(QtWidgets.QDialog):
@@ -32,16 +32,8 @@ class EditDialog(QtWidgets.QDialog):
 
         # その他フィールド
         self.fields = {}
-        for field in [
-            "switch_name",
-            "top_housing",
-            "bottom_housing",
-            "pin",
-            "pre_travel",
-            "total_travel",
-            "operation_force",
-            "link"
-        ]:
+        exclude_fields = ["image", "switch_type"]
+        for field in filter(lambda f: f not in exclude_fields, FIELDS):
             self.fields[field], field_layout = self._create_layout_with_input(
                 f"{field.replace('_', ' ').title()}: ", self.key_info.get(field, "")
             )
