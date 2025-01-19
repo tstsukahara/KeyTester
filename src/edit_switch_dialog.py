@@ -1,8 +1,6 @@
 import os
-
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QInputDialog
-
 from constants import SWITCH_TYPES, FIELDS, DEFAULT_INFO
 
 
@@ -13,9 +11,10 @@ class EditSwitchDialog(QtWidgets.QDialog):
         self.key = key
         self.switch_info = self.parent.switch_info_manager.get_switch_info()
         self.switch_names = list(self.switch_info.keys())
-        self.current_switch_name = list(self.switch_info.keys())[0]
+        self.current_switch_name = self.switch_names[0]
         self.last_opened_directory = os.path.join(os.environ["HOME"], "Downloads")
         self.labels = {}
+        self.fields = {}
         self._setup_ui()
 
     def _setup_ui(self):
@@ -23,111 +22,69 @@ class EditSwitchDialog(QtWidgets.QDialog):
         self.setGeometry(600, 300, 400, 400)
         self.layout = QtWidgets.QVBoxLayout(self)
 
-        # スイッチ名
+        self._create_switch_name_combo()
+        self._create_image_section()
+        self._create_type_combo()
+        self._create_other_fields()
+        self._create_buttons()
+
+    def _create_switch_name_combo(self):
         self.switch_name_combo = QtWidgets.QComboBox()
         self.switch_name_combo.addItems(self.switch_names)
         self.switch_name_combo.setCurrentText(self.current_switch_name)
         self.switch_name_combo.currentIndexChanged.connect(self._on_switch_name_changed)
         self.layout.addLayout(self._create_combo_layout("Switch Name: ", self.switch_name_combo))
 
-        # 画像
-        self.image_path = QtWidgets.QLabel(os.path.basename(self.switch_info.get(self.current_switch_name).get("image")))
+    def _create_image_section(self):
+        self.image_path = QtWidgets.QLabel(os.path.basename(self.switch_info[self.current_switch_name]["image"]))
         self.layout.addLayout(self._create_image_layout())
 
-        # スイッチタイプ
+    def _create_type_combo(self):
         self.type_combo = QtWidgets.QComboBox()
         self.type_combo.addItems(SWITCH_TYPES)
-        self.type_combo.setCurrentText(self.switch_info.get(self.current_switch_name).get("switch_type"))
-        # self.layout.addLayout(self._create_combo_layout("Type: ", self.type_combo))
+        self.type_combo.setCurrentText(self.switch_info[self.current_switch_name]["switch_type"])
+        self.layout.addLayout(self._create_combo_layout("Switch Type: ", self.type_combo))
 
-        # その他フィールド
-        self.fields = {}
+    def _create_other_fields(self):
         exclude_fields = ["switch_name", "image", "switch_type"]
         for field in filter(lambda f: f not in exclude_fields, FIELDS):
             self.fields[field], field_layout = self._create_layout_with_input(
-                f"{field.replace('_', ' ').title()}: ", self.switch_info.get(self.current_switch_name).get(field, "")
+                f"{field.replace('_', ' ').title()}: ", self.switch_info[self.current_switch_name].get(field, "")
             )
             self.layout.addLayout(field_layout)
 
-        # 区切り線
-        line = QtWidgets.QFrame()
-        line.setFrameShape(QtWidgets.QFrame.HLine)
-        line.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.layout.addWidget(line)
+    def _create_buttons(self):
+        self.layout.addWidget(self._create_separator())
 
-        # Saveボタン
-        self.save_button = QtWidgets.QPushButton("Save", self)
-        self.save_button.clicked.connect(self._save)
-        self.layout.addWidget(self.save_button)
+        buttons = [
+            ("Save", self._save),
+            ("Delete", self._show_confirm),
+            ("Create New", self._create_new),
+            ("Cancel", self._cancel),
+            ("Close", self._close)
+        ]
 
-        # Deleteボタン
-        self.delete_button = QtWidgets.QPushButton("Delete", self)
-        self.delete_button.clicked.connect(self._show_confirm)
-        self.layout.addWidget(self.delete_button)
+        for text, callback in buttons:
+            button = QtWidgets.QPushButton(text, self)
+            button.clicked.connect(callback)
+            self.layout.addWidget(button)
+            setattr(self, f"{text.lower().replace(' ', '_')}_button", button)
 
-        # Newボタン
-        self.new_button = QtWidgets.QPushButton("Create New", self)
-        self.new_button.clicked.connect(self._create_new)
-        self.layout.addWidget(self.new_button)
-
-        # Cancelボタン
-        self.cancel_button = QtWidgets.QPushButton("Cancel", self)
-        self.cancel_button.clicked.connect(self._cancel)
-        self.layout.addWidget(self.cancel_button)
         self.cancel_button.hide()
-
-        # Closeボタン
-        self.close_button = QtWidgets.QPushButton("Close", self)
-        self.close_button.clicked.connect(self._close)
-        self.layout.addWidget(self.close_button)
-
-
-
-    def _create_new(self):
-        # 新しいスイッチ名の入力を求める
-        new_name, ok = QInputDialog.getText(self, 'New Switch', 'Enter new switch name:')
-        if ok and new_name:
-            if new_name in self.switch_names:
-                QMessageBox.warning(self, "Warning", "This switch name already exists.")
-                return
-            # 新しいスイッチ情報を初期化
-            self.switch_info[new_name] = DEFAULT_INFO
-            self.switch_info[new_name]["switch_name"] = new_name
-            self.switch_names.append(new_name)
-            self.current_switch_name = new_name
-            self.switch_name_combo.addItem(new_name)
-            self.switch_name_combo.setCurrentText(new_name)
-            # フィールドをクリア
-            self.image_path.setText("")
-            self.type_combo.setCurrentIndex(0)
-            for field, widget in self.fields.items():
-                widget.setText("")
-
-            self.switch_name_combo.setDisabled(True)
-            self.delete_button.hide()
-            self.new_button.hide()
-            self.close_button.hide()
-            self.cancel_button.show()
 
     def _on_switch_name_changed(self, index):
         self.current_switch_name = self.switch_names[index]
         self._update_display()
 
     def _update_display(self):
-        # 画像の更新
-        self.image_path.setText(os.path.basename(self.switch_info.get(self.current_switch_name).get("image")))
-        # スイッチタイプの更新
-        self.type_combo.setCurrentText(self.switch_info.get(self.current_switch_name).get("switch_type"))
-        # その他フィールドの更新
+        self.image_path.setText(os.path.basename(self.switch_info[self.current_switch_name]["image"]))
+        self.type_combo.setCurrentText(self.switch_info[self.current_switch_name]["switch_type"])
         for field, widget in self.fields.items():
-            widget.setText(self.switch_info.get(self.current_switch_name).get(field, ""))
+            widget.setText(self.switch_info[self.current_switch_name].get(field, ""))
 
     def _show_confirm(self):
-        # 確認ダイアログの表示
-        reply = QMessageBox.question(self, 'Message',
-                                     "Are you sure to delete switch info?",
-                                     QMessageBox.Yes | QMessageBox.No,
-                                     QMessageBox.No)
+        reply = QMessageBox.question(self, 'Message', "Are you sure to delete switch info?",
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             self._delete()
 
@@ -136,28 +93,22 @@ class EditSwitchDialog(QtWidgets.QDialog):
             self, "Select Image", self.last_opened_directory, "Images (*.png *.jpg *.jpeg)"
         )
         if file_path:
-            self.last_opened_directory = '/'.join(file_path.split('/')[:-1])
+            self.last_opened_directory = os.path.dirname(file_path)
             self.image_path.setText(file_path)
 
     def _save(self):
         for field, widget in self.fields.items():
-            if isinstance(widget, QtWidgets.QComboBox):
-                self.switch_info.get(self.current_switch_name)[field] = widget.currentText()
-            else:
-                self.switch_info.get(self.current_switch_name)[field] = widget.text()
+            self.switch_info[self.current_switch_name][field] = widget.text()
 
         new_image_path = self.parent.key_info_manager.save_image(self.image_path.text())
         if new_image_path:
-            self.switch_info.get(self.current_switch_name)["image"] = os.path.basename(new_image_path)
+            self.switch_info[self.current_switch_name]["image"] = os.path.basename(new_image_path)
 
-        self.parent.switch_info_manager.update_switch_info(self.current_switch_name, self.switch_info.get(self.current_switch_name))
-        self.parent.ui_manager.update_display_info(self.key, self.switch_info.get(self.current_switch_name))
+        self.parent.switch_info_manager.update_switch_info(self.current_switch_name,
+                                                           self.switch_info[self.current_switch_name])
+        self.parent.ui_manager.update_display_info(self.key, self.switch_info[self.current_switch_name])
 
-        self.switch_name_combo.setDisabled(False)
-        self.delete_button.show()
-        self.close_button.show()
-        self.new_button.show()
-        self.cancel_button.hide()
+        self._toggle_ui_elements(True)
 
     def _delete(self):
         self.parent.switch_info_manager.delete_switch_info(self.current_switch_name)
@@ -165,17 +116,27 @@ class EditSwitchDialog(QtWidgets.QDialog):
         self.switch_name_combo.removeItem(self.switch_name_combo.findText(self.current_switch_name))
         self.parent.ui_manager.update_display_info(self.key, None)
 
+    def _create_new(self):
+        new_name, ok = QInputDialog.getText(self, 'New Switch', 'Enter new switch name:')
+        if ok and new_name:
+            if new_name in self.switch_names:
+                QMessageBox.warning(self, "Warning", "This switch name already exists.")
+                return
+            self.switch_info[new_name] = DEFAULT_INFO.copy()
+            self.switch_info[new_name]["switch_name"] = new_name
+            self.switch_names.append(new_name)
+            self.current_switch_name = new_name
+            self.switch_name_combo.addItem(new_name)
+            self.switch_name_combo.setCurrentText(new_name)
+            self._clear_fields()
+            self._toggle_ui_elements(False)
+
     def _cancel(self):
         self.switch_names.remove(self.current_switch_name)
         self.parent.switch_info_manager.delete_switch_info(self.current_switch_name)
         self.switch_name_combo.removeItem(self.switch_name_combo.findText(self.current_switch_name))
-        self.switch_name_combo.setCurrentText(self.current_switch_name)
-
-        self.switch_name_combo.setDisabled(False)
-        self.delete_button.show()
-        self.close_button.show()
-        self.new_button.show()
-        self.cancel_button.hide()
+        self.switch_name_combo.setCurrentText(self.switch_names[0])
+        self._toggle_ui_elements(True)
 
     def _close(self):
         self.current_switch_name = self.switch_names[0]
@@ -183,7 +144,6 @@ class EditSwitchDialog(QtWidgets.QDialog):
         self.accept()
 
     def _create_image_layout(self):
-        """画像レイアウト作成ヘルパー"""
         layout = QtWidgets.QHBoxLayout()
         layout.addWidget(QtWidgets.QLabel("Image: "))
         layout.addWidget(self.image_path)
@@ -193,17 +153,34 @@ class EditSwitchDialog(QtWidgets.QDialog):
         return layout
 
     def _create_combo_layout(self, label_text, combo):
-        """comboレイアウト作成ヘルパー"""
         layout = QtWidgets.QHBoxLayout()
         layout.addWidget(QtWidgets.QLabel(label_text))
         layout.addWidget(combo)
         return layout
 
     def _create_layout_with_input(self, label_text, input_text):
-        """labelとinputを含むレイアウト作成ヘルパー"""
         layout = QtWidgets.QHBoxLayout()
         layout.addWidget(QtWidgets.QLabel(label_text))
         input_field = QtWidgets.QLineEdit(self)
         input_field.setText(input_text)
         layout.addWidget(input_field)
         return input_field, layout
+
+    def _create_separator(self):
+        line = QtWidgets.QFrame()
+        line.setFrameShape(QtWidgets.QFrame.HLine)
+        line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        return line
+
+    def _clear_fields(self):
+        self.image_path.setText("")
+        self.type_combo.setCurrentIndex(0)
+        for field, widget in self.fields.items():
+            widget.setText("")
+
+    def _toggle_ui_elements(self, enabled):
+        self.switch_name_combo.setDisabled(not enabled)
+        self.delete_button.setVisible(enabled)
+        self.close_button.setVisible(enabled)
+        self.create_new_button.setVisible(enabled)
+        self.cancel_button.setVisible(not enabled)
