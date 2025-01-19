@@ -55,7 +55,7 @@ class EditSwitchDialog(QtWidgets.QDialog):
 
         # Deleteボタン
         delete_button = QtWidgets.QPushButton("Delete", self)
-        delete_button.clicked.connect(self._show_check_dialog)
+        delete_button.clicked.connect(self._show_confirm)
         self.layout.addWidget(delete_button)
 
         # Cancelボタン
@@ -83,10 +83,10 @@ class EditSwitchDialog(QtWidgets.QDialog):
         for field, widget in self.fields.items():
             widget.setText(self.switch_info.get(self.current_switch_name).get(field, ""))
 
-    def _show_check_dialog(self):
+    def _show_confirm(self):
         # 確認ダイアログの表示
         reply = QMessageBox.question(self, 'Message',
-                                     "Are you sure you want to delete?",
+                                     "Are you sure to delete switch info?",
                                      QMessageBox.Yes | QMessageBox.No,
                                      QMessageBox.No)
         if reply == QMessageBox.Yes:
@@ -115,7 +115,7 @@ class EditSwitchDialog(QtWidgets.QDialog):
         self.accept()
 
     def _delete(self):
-        self.parent.switch_info_manager.delete_switch_info(self.key)
+        self.parent.switch_info_manager.delete_switch_info(self.current_switch_name)
         self.parent.ui_manager.update_display_info(self.key, None)
         self.accept()
 

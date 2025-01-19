@@ -1,6 +1,7 @@
 import os
 
 from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 
 from constants import SWITCH_TYPES, FIELDS
 
@@ -31,7 +32,7 @@ class ChangeDialog(QtWidgets.QDialog):
 
         # Deleteボタン
         delete_button = QtWidgets.QPushButton("Delete", self)
-        delete_button.clicked.connect(self._delete)
+        delete_button.clicked.connect(self._show_confirm)
         layout.addWidget(delete_button)
 
     def _save(self):
@@ -44,6 +45,15 @@ class ChangeDialog(QtWidgets.QDialog):
         self.parent.key_info_manager.delete_key_map(self.key)
         self.parent.ui_manager.update_display_info(self.key, None)
         self.accept()
+
+    def _show_confirm(self):
+        # 確認ダイアログの表示
+        reply = QMessageBox.question(self, 'Message',
+                                     "Are you sure to delete key map?",
+                                     QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self._delete()
 
     def _update_switch_name(self):
         self.switch_name = self.select_box.currentText()
