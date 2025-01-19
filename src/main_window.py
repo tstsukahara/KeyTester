@@ -4,8 +4,8 @@ from PyQt5.QtGui import QKeyEvent
 from config_manager import ConfigManager
 from constants import VALID_KEYS
 from key_map_manager import KeyMapManager
-from src.change_dialog import ChangeDialog
-from src.edit_switch_dialog import EditSwitchDialog
+from src.change_key_map_dialog import ChangeKeyMapDialog
+from src.edit_switch_info_dialog import EditSwitchInfoDialog
 from src.switch_info_manager import SwitchInfoManager
 from ui_manager import UIManager
 
@@ -32,10 +32,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def open_switch_edit(self):
         key = self.key_info_manager.get_current_key()
-        dialog = EditSwitchDialog(self, key)
+        dialog = EditSwitchInfoDialog(self, key)
         dialog.exec_()
 
     def open_change_dialog(self):
         key = self.key_info_manager.get_current_key()
-        dialog = ChangeDialog(self, key)
+        dialog = ChangeKeyMapDialog(self, key)
         dialog.exec_()

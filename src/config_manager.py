@@ -45,11 +45,6 @@ class ConfigManager:
             self._update_setting(new_base_dir)
             self.parent.key_info_manager.set_key_map(self.load_key_map_file())
 
-    def edit_switch_info(self):
-        key_info = self.key_info_manager.get_key_map().get(key, DEFAULT_INFO.copy())
-        dialog = EditDialog(self, self.parent.switch_info_manager.get_switch_info())
-        dialog.exec_()
-
     def _update_setting(self, base_dir):
         self.base_dir = base_dir
         self.key_map_file = os.path.join(self.base_dir, KEY_MAP_FILE)

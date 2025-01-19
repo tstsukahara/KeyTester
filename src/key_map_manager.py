@@ -21,8 +21,8 @@ class KeyMapManager:
     def set_key_map(self, key_map):
         self.key_map = key_map
 
-    def update_key_map(self, key, key_info):
-        self.key_map[key] = key_info
+    def update_key_map(self, key, key_map):
+        self.key_map[key] = key_map
         self.parent.config_manager.save_key_map_file(self.key_map)
 
     def delete_key_map(self, key):

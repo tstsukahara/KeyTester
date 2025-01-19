@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog
 from constants import SWITCH_TYPES, FIELDS, DEFAULT_INFO
 
 
-class EditSwitchDialog(QtWidgets.QDialog):
+class EditSwitchInfoDialog(QtWidgets.QDialog):
     def __init__(self, parent, key):
         super().__init__(parent)
         self.parent = parent

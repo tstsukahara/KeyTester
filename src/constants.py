@@ -1,4 +1,3 @@
-"""定数の定義"""
 import os
 
 DEFAULT_BASE_DIR = os.path.join(os.environ["HOME"], "Documents/KeyTester")

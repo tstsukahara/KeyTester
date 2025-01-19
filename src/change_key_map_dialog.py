@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QMessageBox
 from constants import SWITCH_TYPES, FIELDS
 
 
-class ChangeDialog(QtWidgets.QDialog):
+class ChangeKeyMapDialog(QtWidgets.QDialog):
     def __init__(self, parent, key):
         super().__init__(parent)
         self.parent = parent
