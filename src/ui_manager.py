@@ -71,21 +71,21 @@ class UIManager:
             label.setTextFormat(Qt.RichText)
         return label
 
-    def update_display_info(self, key, key_info):
+    def update_display_info(self, key, switch_info):
         self.labels["key"].setText(f"Key: {key}")
-        if key and key_info:
-            self._update_label_info(key_info)
+        if key and switch_info:
+            self._update_label_info(switch_info)
         else:
             self._clear_labels(key)
 
-    def _update_label_info(self, key_info):
-        self._update_label(self.labels["image"], key_info.get("image"), is_image=True)
+    def _update_label_info(self, switch_info):
+        self._update_label(self.labels["image"], switch_info.get("image"), is_image=True)
 
         exclude_fields = ["image"]
         for field in filter(lambda f: f not in exclude_fields, FIELDS):
             field_title = f"{field.replace('_', ' ').title()}: " if field != "switch_name" else ''
-            self._update_label(self.labels[field], f"{field_title}{key_info.get(field)}")
-        self._update_label(self.labels["link"], f'Link: <a href="{key_info.get("link")}">url</a>')
+            self._update_label(self.labels[field], f"{field_title}{switch_info.get(field)}")
+        self._update_label(self.labels["link"], f'Link: <a href="{switch_info.get("link")}">url</a>')
 
     def _update_label(self, label, content, is_image=False):
         if is_image:
