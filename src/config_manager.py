@@ -43,7 +43,7 @@ class ConfigManager:
         if new_base_dir:
             self.settings.setValue("base_dir", new_base_dir)
             self._update_setting(new_base_dir)
-            self.parent.key_info_manager.set_key_map(self.load_key_map_file())
+            self.parent.key_map_manager.set_key_map(self.load_key_map_file())
 
     def _update_setting(self, base_dir):
         self.base_dir = base_dir

@@ -17,7 +17,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setGeometry(300, 200, 400, 400)
 
         self.config_manager = ConfigManager(self)
-        self.key_info_manager = KeyMapManager(self)
+        self.key_map_manager = KeyMapManager(self)
         self.switch_info_manager = SwitchInfoManager(self)
         self.ui_manager = UIManager(self)
         self.ui_manager.setup_ui()
@@ -25,17 +25,17 @@ class MainWindow(QtWidgets.QMainWindow):
     def keyPressEvent(self, event: QKeyEvent) -> None:
         key = event.text().lower()
         if key in VALID_KEYS:
-            self.key_info_manager.set_current_key(key)
+            self.key_map_manager.set_current_key(key)
             self.ui_manager.hide_label("message")
-            self.ui_manager.update_display_info(key, self.switch_info_manager.switch_info.get(self.key_info_manager.key_map.get(key)))
+            self.ui_manager.update_display_info(key, self.switch_info_manager.switch_info.get(self.key_map_manager.key_map.get(key)))
             self.ui_manager.show_edit_button()
 
     def open_switch_edit(self):
-        key = self.key_info_manager.get_current_key()
+        key = self.key_map_manager.get_current_key()
         dialog = EditSwitchInfoDialog(self, key)
         dialog.exec_()
 
     def open_change_dialog(self):
-        key = self.key_info_manager.get_current_key()
+        key = self.key_map_manager.get_current_key()
         dialog = ChangeKeyMapDialog(self, key)
         dialog.exec_()

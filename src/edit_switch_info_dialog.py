@@ -100,7 +100,7 @@ class EditSwitchInfoDialog(QtWidgets.QDialog):
         for field, widget in self.fields.items():
             self.switch_info[self.current_switch_name][field] = widget.text()
 
-        new_image_path = self.parent.key_info_manager.save_image(self.image_path.text())
+        new_image_path = self.parent.key_map_manager.save_image(self.image_path.text())
         if new_image_path:
             self.switch_info[self.current_switch_name]["image"] = os.path.basename(new_image_path)
 

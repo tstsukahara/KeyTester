@@ -12,7 +12,7 @@ class ChangeKeyMapDialog(QtWidgets.QDialog):
         self.parent = parent
         self.key = key
         self.switch_info = self.parent.switch_info_manager.get_switch_info()
-        self.switch_name = self.parent.key_info_manager.get_key_map().get(self.key)
+        self.switch_name = self.parent.key_map_manager.get_key_map().get(self.key)
         self._setup_ui()
 
     def _setup_ui(self):
@@ -42,12 +42,12 @@ class ChangeKeyMapDialog(QtWidgets.QDialog):
 
     def _save(self):
         self._update_switch_name()
-        self.parent.key_info_manager.update_key_map(self.key, self.switch_name)
+        self.parent.key_map_manager.update_key_map(self.key, self.switch_name)
         self.parent.ui_manager.update_display_info(self.key, self.switch_info.get(self.switch_name))
         self.accept()
 
     def _delete(self):
-        self.parent.key_info_manager.delete_key_map(self.key)
+        self.parent.key_map_manager.delete_key_map(self.key)
         self.parent.ui_manager.update_display_info(self.key, None)
         self.accept()
 
