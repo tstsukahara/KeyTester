@@ -24,9 +24,13 @@ class UIManager:
         menubar = self.parent.menuBar()
 
         setting_menu = menubar.addMenu("Settings")
-        change_base_dir_action = QtWidgets.QAction("Change Base Directory...", self.parent)
+        change_base_dir_action = QtWidgets.QAction(
+            "Change Base Directory...", self.parent
+        )
         change_base_dir_action.setShortcut(QKeySequence("Ctrl+O"))
-        change_base_dir_action.triggered.connect(self.parent.config_manager.change_base_dir)
+        change_base_dir_action.triggered.connect(
+            self.parent.config_manager.change_base_dir
+        )
         setting_menu.addAction(change_base_dir_action)
 
         switch_menu = menubar.addMenu("Switches")
@@ -59,7 +63,9 @@ class UIManager:
         self.edit_button.hide()
         self.main_layout.addWidget(self.edit_button)
 
-    def _create_label(self, text, alignment=Qt.AlignCenter, bold=False, font_size=None, link=False):
+    def _create_label(
+        self, text, alignment=Qt.AlignCenter, bold=False, font_size=None, link=False
+    ):
         label = QtWidgets.QLabel(text, self.parent)
         label.setAlignment(alignment)
         style = []
@@ -83,18 +89,28 @@ class UIManager:
             self._clear_labels(key)
 
     def _update_label_info(self, switch_info):
-        self._update_label(self.labels["image"], switch_info.get("image"), is_image=True)
+        self._update_label(
+            self.labels["image"], switch_info.get("image"), is_image=True
+        )
 
         exclude_fields = ["image"]
         for field in filter(lambda f: f not in exclude_fields, FIELDS):
-            field_title = f"{field.replace('_', ' ').title()}: " if field != "switch_name" else ''
-            self._update_label(self.labels[field], f"{field_title}{switch_info.get(field)}")
-        self._update_label(self.labels["link"], f'Link: <a href="{switch_info.get("link")}">url</a>')
+            field_title = (
+                f"{field.replace('_', ' ').title()}: " if field != "switch_name" else ""
+            )
+            self._update_label(
+                self.labels[field], f"{field_title}{switch_info.get(field)}"
+            )
+        self._update_label(
+            self.labels["link"], f'Link: <a href="{switch_info.get("link")}">url</a>'
+        )
 
     def _update_label(self, label, content, is_image=False):
         if is_image:
             label.clear()
-            image_path = os.path.join(self.parent.config_manager.get_image_dir(), content)
+            image_path = os.path.join(
+                self.parent.config_manager.get_image_dir(), content
+            )
             if os.path.exists(image_path):
                 pixmap = QtGui.QPixmap(image_path)
                 if not pixmap.isNull():

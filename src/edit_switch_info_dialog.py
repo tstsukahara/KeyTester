@@ -33,23 +33,32 @@ class EditSwitchInfoDialog(QtWidgets.QDialog):
         self.switch_name_combo.addItems(self.switch_names)
         self.switch_name_combo.setCurrentText(self.current_switch_name)
         self.switch_name_combo.currentIndexChanged.connect(self._on_switch_name_changed)
-        self.layout.addLayout(self._create_combo_layout("Switch Name: ", self.switch_name_combo))
+        self.layout.addLayout(
+            self._create_combo_layout("Switch Name: ", self.switch_name_combo)
+        )
 
     def _create_image_section(self):
-        self.image_path = QtWidgets.QLabel(os.path.basename(self.switch_info[self.current_switch_name]["image"]))
+        self.image_path = QtWidgets.QLabel(
+            os.path.basename(self.switch_info[self.current_switch_name]["image"])
+        )
         self.layout.addLayout(self._create_image_layout())
 
     def _create_type_combo(self):
         self.type_combo = QtWidgets.QComboBox()
         self.type_combo.addItems(SWITCH_TYPES)
-        self.type_combo.setCurrentText(self.switch_info[self.current_switch_name]["switch_type"])
-        self.layout.addLayout(self._create_combo_layout("Switch Type: ", self.type_combo))
+        self.type_combo.setCurrentText(
+            self.switch_info[self.current_switch_name]["switch_type"]
+        )
+        self.layout.addLayout(
+            self._create_combo_layout("Switch Type: ", self.type_combo)
+        )
 
     def _create_other_fields(self):
         exclude_fields = ["switch_name", "image", "switch_type"]
         for field in filter(lambda f: f not in exclude_fields, FIELDS):
             self.fields[field], field_layout = self._create_layout_with_input(
-                f"{field.replace('_', ' ').title()}: ", self.switch_info[self.current_switch_name].get(field, "")
+                f"{field.replace('_', ' ').title()}: ",
+                self.switch_info[self.current_switch_name].get(field, ""),
             )
             self.layout.addLayout(field_layout)
 
@@ -61,7 +70,7 @@ class EditSwitchInfoDialog(QtWidgets.QDialog):
             ("Delete", self._show_confirm),
             ("Create New", self._create_new),
             ("Cancel", self._cancel),
-            ("Close", self._close)
+            ("Close", self._close),
         ]
 
         for text, callback in buttons:
@@ -77,20 +86,32 @@ class EditSwitchInfoDialog(QtWidgets.QDialog):
         self._update_display()
 
     def _update_display(self):
-        self.image_path.setText(os.path.basename(self.switch_info[self.current_switch_name]["image"]))
-        self.type_combo.setCurrentText(self.switch_info[self.current_switch_name]["switch_type"])
+        self.image_path.setText(
+            os.path.basename(self.switch_info[self.current_switch_name]["image"])
+        )
+        self.type_combo.setCurrentText(
+            self.switch_info[self.current_switch_name]["switch_type"]
+        )
         for field, widget in self.fields.items():
             widget.setText(self.switch_info[self.current_switch_name].get(field, ""))
 
     def _show_confirm(self):
-        reply = QMessageBox.question(self, 'Message', "Are you sure to delete switch info?",
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        reply = QMessageBox.question(
+            self,
+            "Message",
+            "Are you sure to delete switch info?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
         if reply == QMessageBox.Yes:
             self._delete()
 
     def _choose_image(self):
         file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, "Select Image", self.last_opened_directory, "Images (*.png *.jpg *.jpeg)"
+            self,
+            "Select Image",
+            self.last_opened_directory,
+            "Images (*.png *.jpg *.jpeg)",
         )
         if file_path:
             self.parent.config_manager.set_open_dir(os.path.dirname(file_path))
@@ -102,20 +123,32 @@ class EditSwitchInfoDialog(QtWidgets.QDialog):
 
         new_image_path = self.parent.key_map_manager.save_image(self.image_path.text())
         if new_image_path:
-            self.switch_info[self.current_switch_name]["image"] = os.path.basename(new_image_path)
+            self.switch_info[self.current_switch_name]["image"] = os.path.basename(
+                new_image_path
+            )
 
-        self.parent.switch_info_manager.update_switch_info(self.current_switch_name,
-                                                           self.switch_info[self.current_switch_name])
+        self.parent.switch_info_manager.update_switch_info(
+            self.current_switch_name, self.switch_info[self.current_switch_name]
+        )
         self._toggle_ui_elements(True)
 
     def _delete(self):
         self.parent.switch_info_manager.delete_switch_info(self.current_switch_name)
         self.switch_names.remove(self.current_switch_name)
-        self.switch_name_combo.removeItem(self.switch_name_combo.findText(self.current_switch_name))
-        self.parent.ui_manager.update_display_info(self.key, self.switch_info.get(self.parent.key_map_manager.get_key_map().get(self.key)))
+        self.switch_name_combo.removeItem(
+            self.switch_name_combo.findText(self.current_switch_name)
+        )
+        self.parent.ui_manager.update_display_info(
+            self.key,
+            self.switch_info.get(
+                self.parent.key_map_manager.get_key_map().get(self.key)
+            ),
+        )
 
     def _create_new(self):
-        new_name, ok = QInputDialog.getText(self, 'New Switch', 'Enter new switch name:')
+        new_name, ok = QInputDialog.getText(
+            self, "New Switch", "Enter new switch name:"
+        )
         if ok and new_name:
             if new_name in self.switch_names:
                 QMessageBox.warning(self, "Warning", "This switch name already exists.")
@@ -132,7 +165,9 @@ class EditSwitchInfoDialog(QtWidgets.QDialog):
     def _cancel(self):
         self.switch_names.remove(self.current_switch_name)
         self.parent.switch_info_manager.delete_switch_info(self.current_switch_name)
-        self.switch_name_combo.removeItem(self.switch_name_combo.findText(self.current_switch_name))
+        self.switch_name_combo.removeItem(
+            self.switch_name_combo.findText(self.current_switch_name)
+        )
         self.switch_name_combo.setCurrentText(self.switch_names[0])
         self._toggle_ui_elements(True)
 

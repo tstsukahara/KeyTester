@@ -3,7 +3,13 @@ import os
 
 from PyQt5 import QtCore, QtWidgets
 
-from constants import DEFAULT_BASE_DIR, KEY_MAP_FILE, IMAGE_DIR, SWITCH_FILE, DEFAULT_OPEN_DIR
+from constants import (
+    DEFAULT_BASE_DIR,
+    KEY_MAP_FILE,
+    IMAGE_DIR,
+    SWITCH_FILE,
+    DEFAULT_OPEN_DIR,
+)
 
 
 class ConfigManager:
@@ -14,7 +20,7 @@ class ConfigManager:
         self.key_map_file = os.path.join(self.base_dir, KEY_MAP_FILE)
         self.switch_file = os.path.join(self.base_dir, SWITCH_FILE)
         self.image_dir = os.path.join(self.base_dir, IMAGE_DIR)
-        self.open_dir =  self.settings.value("open_dir", DEFAULT_OPEN_DIR)
+        self.open_dir = self.settings.value("open_dir", DEFAULT_OPEN_DIR)
         os.makedirs(self.image_dir, exist_ok=True)
 
     def load_key_map_file(self):
