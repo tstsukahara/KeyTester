@@ -4,9 +4,9 @@ from PyQt5.QtGui import QKeyEvent
 from config_manager import ConfigManager
 from constants import VALID_KEYS
 from key_map_manager import KeyMapManager
-from src.change_key_map_dialog import ChangeKeyMapDialog
-from src.edit_switch_info_dialog import EditSwitchInfoDialog
-from src.switch_info_manager import SwitchInfoManager
+from change_key_map_dialog import ChangeKeyMapDialog
+from edit_switch_info_dialog import EditSwitchInfoDialog
+from switch_info_manager import SwitchInfoManager
 from ui_manager import UIManager
 
 

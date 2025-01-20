@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeySequence
 
-from src.constants import FIELDS
+from constants import FIELDS
 
 
 class UIManager:
