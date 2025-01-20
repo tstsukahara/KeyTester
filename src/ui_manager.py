@@ -2,6 +2,7 @@ import os
 
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QKeySequence
 
 from src.constants import FIELDS
 
@@ -21,15 +22,18 @@ class UIManager:
 
     def _setup_menu(self):
         menubar = self.parent.menuBar()
-        setting_menu = menubar.addMenu("Settings")
 
+        setting_menu = menubar.addMenu("Settings")
         change_base_dir_action = QtWidgets.QAction("Change Base Directory...", self.parent)
+        change_base_dir_action.setShortcut(QKeySequence("Ctrl+O"))
         change_base_dir_action.triggered.connect(self.parent.config_manager.change_base_dir)
         setting_menu.addAction(change_base_dir_action)
 
+        switch_menu = menubar.addMenu("Switches")
         edit_switch_info_action = QtWidgets.QAction("Edit Switch Info...", self.parent)
+        edit_switch_info_action.setShortcut(QKeySequence("Ctrl+E"))
         edit_switch_info_action.triggered.connect(self.parent.open_switch_edit)
-        setting_menu.addAction(edit_switch_info_action)
+        switch_menu.addAction(edit_switch_info_action)
 
     def _setup_main_layout(self):
         central_widget = QtWidgets.QWidget()
