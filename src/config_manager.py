@@ -39,7 +39,7 @@ class ConfigManager:
 
     def change_base_dir(self):
         new_base_dir = QtWidgets.QFileDialog.getExistingDirectory(
-            self.parent, "Select Directory"
+            self.parent, "Select Directory", DEFAULT_BASE_DIR
         )
         if new_base_dir:
             self.settings.setValue("base_dir", new_base_dir)
