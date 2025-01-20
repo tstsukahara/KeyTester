@@ -12,7 +12,7 @@ class EditSwitchInfoDialog(QtWidgets.QDialog):
         self.switch_info = self.parent.switch_info_manager.get_switch_info()
         self.switch_names = list(self.switch_info.keys())
         self.current_switch_name = self.switch_names[0]
-        self.last_opened_directory = os.path.join(os.environ["HOME"], "Downloads")
+        self.last_opened_directory = self.parent.config_manager.get_open_dir()
         self.labels = {}
         self.fields = {}
         self._setup_ui()
@@ -93,7 +93,7 @@ class EditSwitchInfoDialog(QtWidgets.QDialog):
             self, "Select Image", self.last_opened_directory, "Images (*.png *.jpg *.jpeg)"
         )
         if file_path:
-            self.last_opened_directory = os.path.dirname(file_path)
+            self.parent.config_manager.set_open_dir(os.path.dirname(file_path))
             self.image_path.setText(file_path)
 
     def _save(self):
