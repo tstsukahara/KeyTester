@@ -24,10 +24,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         key = event.text().lower()
-        if key in VALID_KEYS:
+        if key and key in VALID_KEYS:
             self.key_map_manager.set_current_key(key)
             self.ui_manager.hide_label("message")
-            self.ui_manager.update_display_info(key, self.switch_info_manager.switch_info.get(self.key_map_manager.key_map.get(key)))
+            self.ui_manager.update_display_info(key, self.switch_info_manager.get_switch_info().get(self.key_map_manager.key_map.get(key)))
             self.ui_manager.show_edit_button()
 
     def open_switch_edit(self):

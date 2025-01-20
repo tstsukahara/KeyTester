@@ -4,6 +4,7 @@ DEFAULT_BASE_DIR = os.path.join(os.environ["HOME"], "Documents/KeyTester")
 KEY_MAP_FILE = "key_map.json"
 SWITCH_FILE = "switch_info.json"
 IMAGE_DIR = "images"
+DEFAULT_OPEN_DIR = os.path.join(os.environ["HOME"], "Downloads")
 VALID_KEYS = r"1234567890-=qwertyuiop[]\asdfghjkl;'zxcvbnm,./"
 SWITCH_TYPES = ["-", "Linear", "Tactile", "Clicky", "Silent Linear", "Silent Tactile", "Silent Clicky",]
 FIELDS = [
