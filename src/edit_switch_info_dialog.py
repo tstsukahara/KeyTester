@@ -106,15 +106,13 @@ class EditSwitchInfoDialog(QtWidgets.QDialog):
 
         self.parent.switch_info_manager.update_switch_info(self.current_switch_name,
                                                            self.switch_info[self.current_switch_name])
-        self.parent.ui_manager.update_display_info(self.key, self.switch_info[self.current_switch_name])
-
         self._toggle_ui_elements(True)
 
     def _delete(self):
         self.parent.switch_info_manager.delete_switch_info(self.current_switch_name)
         self.switch_names.remove(self.current_switch_name)
         self.switch_name_combo.removeItem(self.switch_name_combo.findText(self.current_switch_name))
-        self.parent.ui_manager.update_display_info(self.key, None)
+        self.parent.ui_manager.update_display_info(self.key, self.switch_info.get(self.parent.key_map_manager.get_key_map().get(self.key)))
 
     def _create_new(self):
         new_name, ok = QInputDialog.getText(self, 'New Switch', 'Enter new switch name:')
