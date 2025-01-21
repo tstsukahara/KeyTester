@@ -1,7 +1,7 @@
 
 
 # KeyTester
---------
+
 <img src="resources/KeyTester.ico" width="200px">
 
 <details open>
@@ -23,9 +23,9 @@ python src/main.py
 ```
 
 #### Running as a Mac application
-Execute dist/KeyTester.app created by building
+You can download app for Apple Silicon from [here](https://github.com/tstsukahara/KeyTester/releases), or build it in your platform.
 ```shell
-# Build
+# Build command
 pyinstaller KeyTester.spec
 ```
 
@@ -67,6 +67,13 @@ python src/main.py
 ビルドして作成されたdist/KeyTester.appを実行する
 ```shell
 # Build
+pyinstaller KeyTester.spec
+```
+#### Macアプリケーションとして実行
+[ここ](https://github.com/tstsukahara/KeyTester/releases)からApple Silicon用Appをダウンロードするか、
+利用している環境でビルドする
+```shell
+# Buildコマンド
 pyinstaller KeyTester.spec
 ```
 
