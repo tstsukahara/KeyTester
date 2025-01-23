@@ -127,6 +127,8 @@ class EditSwitchInfoDialog(QtWidgets.QDialog):
                 new_image_path
             )
 
+        self.switch_info[self.current_switch_name]["switch_type"] = self.type_combo.currentText()
+
         self.parent.switch_info_manager.update_switch_info(
             self.current_switch_name, self.switch_info[self.current_switch_name]
         )
